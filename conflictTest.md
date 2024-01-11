@@ -1,3 +1,3 @@
 this is conflict
 from gitHub
-gitHub change #2
+vs code change #2
