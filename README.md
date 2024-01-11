@@ -1,5 +1,3 @@
 
 # startup
-This is git
-
-in dir
+[notes](./notes.md)
