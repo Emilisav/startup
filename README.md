@@ -34,5 +34,5 @@ The questions button will reload the questions. The stars will be clickable only
 ![Loggein screen](https://github.com/Emilisav/startup/assets/144365339/759ec4de-1b97-427e-a2f3-08bfa96ff308)
 ![Loggedout Questions](https://github.com/Emilisav/startup/assets/144365339/bd5b3081-ac8e-44ad-b61c-955ec83b18f4)
 
-[Figma design](https://www.figma.com/file/Fg6VrxrCSE1NohcuVY39gn/Untitled?type=design&node-id=1-5&mode=design&t=WDWrVrNgyetLNyEq-0)
+[Figma design](https://www.figma.com/file/Fg6VrxrCSE1NohcuVY39gn/Talkshow?type=design&node-id=0%3A1&mode=design&t=OaUyk8pHjRbHTPUX-1)
 
