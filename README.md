@@ -31,7 +31,7 @@ I am going to use the required technologies in the following ways.
 The questions button will reload the questions. The stars will be clickable only when logged in. The A on the logged in screen will allow you to enter you answer. You can create a new question by clicking the plus.
 
 ![Login screen](https://github.com/Emilisav/startup/assets/144365339/b8dc2b7d-cb1a-46f6-9732-3b24b4b5ae52)
-![Loggedin Questions](https://github.com/Emilisav/startup/assets/144365339/efd3dc44-7a0c-4fd4-be06-21804420977c)
+![Loggein screen](https://github.com/Emilisav/startup/assets/144365339/759ec4de-1b97-427e-a2f3-08bfa96ff308)
 ![Loggedout Questions](https://github.com/Emilisav/startup/assets/144365339/bd5b3081-ac8e-44ad-b61c-955ec83b18f4)
 
 [Figma design](https://www.figma.com/file/Fg6VrxrCSE1NohcuVY39gn/Untitled?type=design&node-id=1-5&mode=design&t=WDWrVrNgyetLNyEq-0)
