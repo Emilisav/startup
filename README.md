@@ -11,6 +11,7 @@ Have you ever found yourself at a loss for what to talk about, or just wanted to
 - ability to add questions
 - rating for questions
 - ability to store answers
+- call Chat GTP's API to recommend questions
 
 # Technology
 I am going to use the required technologies in the following ways.
