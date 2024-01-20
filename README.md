@@ -1,5 +1,7 @@
 ### Talkshow
 [notes](./notes.md)
+[webpage}(http://54.156.218.29/)
+[AWS](https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1)
 
 # Elavator Pitch
 Have you ever found yourself at a loss for what to talk about, or just wanted to know how to get to know poeple? Well, fear not, this talkshow application will help you ask the questions that will make your conversation awesome! Talkshow will show a list of questions, allow you to add your own, as well as rate questions. You also might be able to record answers to questions for your future self to reminise. And all this is avaliabe on any internet connecting device!
