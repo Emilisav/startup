@@ -42,10 +42,10 @@ The questions button will reload the questions. The stars will be clickable only
 # HTML deliverable
 For this deliverable I built out the structure of my application using HTML.
 
-- HTML pages - Three HTML page that represent the ability to login, see questions, and add questions.
-- Links - The login page automatically links to the questions page. The questions page contains a link to the adding questions page.
-- Text - Each of the queations use text.
-- Images - There is an image on login screen
-- DB/Login - Input box and submit button for login. The questions represent data pulled from the database. Adding questions represent adding data to database
-- WebSocket - Represents where the page shows new questions that are created.
+- __HTML__ pages - Three HTML page that represent the ability to login, see questions, and add questions.
+- __Links__ - The login page automatically links to the questions page. The questions page contains a link to the adding questions page.
+- __Text__ - Each of the queations use text.
+- __Images__ - There is an image on login screen
+- __DB/Login__ - Input box and submit button for login. The questions represent data pulled from the database. Adding questions represent adding data to database
+- __WebSocket__ - Represents where the page shows new questions that are created.
 
