@@ -39,7 +39,7 @@ The questions button will reload the questions. The stars will be clickable only
 
 [Figma design](https://www.figma.com/file/Fg6VrxrCSE1NohcuVY39gn/Talkshow?type=design&node-id=0%3A1&mode=design&t=OaUyk8pHjRbHTPUX-1)
 
-#HTML deliverable
+# HTML deliverable
 For this deliverable I built out the structure of my application using HTML.
 
 - HTML pages - Three HTML page that represent the ability to login, see questions, and add questions.
