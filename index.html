@@ -3,12 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Questions</title>
   </head>
   <body>
-    <form action="index.html" method="post">
-      <p>Hello world</p>
-      <button type="submit">Submit</button>
+
+    <main>
+      <h1>Welcome to TalkShow!</h1>
+      <p>Login to add questions or use a guest account</p>
+
+            <form method="get" action="questions.html">
+        <label for="name">Name</label>
+        <input type="text" required id="name" placeholder="Your name here" />
+        
+        <label for="psw">Password</label>
+        <input type="password" id="psw" required placeholder="Your password here" />
+        
+        
+        <button type="submit">Login</button>
+
+        <button type="submit">Guest</button>
+
+
     </form>
+    </main>
+
+    <footer>
+      <hr />
+      <span class="text-reset">Emily De Graw</span>
+      <br />
+      <a href="https://github.com/Emilisav/startup">GitHub</a>
+    </footer>
+    
   </body>
 </html>
