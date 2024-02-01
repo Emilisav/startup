@@ -42,10 +42,13 @@ The questions button will reload the questions. The stars will be clickable only
 # HTML deliverable
 For this deliverable I built out the structure of my application using HTML.
 
-- __HTML__ pages - Three HTML page that represent the ability to login, see questions, and add questions.
-- __Links__ - The login page automatically links to the questions page. The questions page contains a link to the adding questions page.
-- __Text__ - Each of the queations use text.
-- __Images__ - There is an image on login screen
-- __DB/Login__ - Input box and submit button for login. The questions represent data pulled from the database. Adding questions represent adding data to database
-- __WebSocket__ - Represents where the page shows new questions that are created.
+- __HTML__ has two pages for authentication and for the questions.
+- __HTML tags__ used different tags including BODY, NAV, MAIN, HEADER, and FOOTER.
+- __Links__ if user wants to go back to login
+- __Textual content__ Has where it shows top questions
+- __3rd party service calls__ Calls chatGPT for help making questions.
+- __Images__ Shows a thumbs up image to encourage users.
+- __Login__ On login page, shows user name at the top of the questions page
+- __Database__ Questions and rating stored stored in the database
+- __WebSocket__ Shows new questions at bottom of questions page
 
