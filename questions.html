@@ -9,10 +9,37 @@
 
     <main>
       <h1>Welcome to TalkShow!</h1>
-      <p>Questions</p>
+      <p>What number would you like to be on a sports team and why?</p>
+      <p>Since events seem to always happen in threes, what is the next thing to happen to you?</p>
+      <p>What type of books do you take on vacation?</p>
+      <p>What event do you wish you had season tickets to?</p>
+      <p>WHat's your gift?</p>
 
+    <h1>Add a question:</h1>
 
-    </form>
+      <form method="post" action="questions.html">
+        <label for="question">Question</label>
+        <input
+          type="text"
+          required
+          id="question"
+          placeholder="Your question here"
+        />
+
+        <button type="submit">Add Question</button>
+      </form>
+
+      <form method="post" action="questions.html">
+        <label for="questionHelp">Get help from chatGPT</label>
+        <input
+          type="text"
+          required
+          id="questionHelp"
+          placeholder="What do I ask someone who like oranges to discover what else they like?"
+        />
+
+        <button type="submit">Call ChatGPT</button>
+      </form>
     </main>
 
     <footer>
