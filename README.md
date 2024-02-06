@@ -1,6 +1,6 @@
 ### Talkshow
 [notes](./notes.md)
-[webpage](https://talkshow.click)
+[startup](https://startup.talkshow.click)
 [AWS](https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1)
 
 # Elavator Pitch
