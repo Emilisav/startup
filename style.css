@@ -1,0 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100..900&display=swap");
+
+:root {
+  color: white;
+  font-family: "Encode Sans";
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  flex: 0 50px;
+  background: darkblue;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+h1 {
+  padding-left: 10px;
+  font-size: 20px;
+}
+
+footer {
+  flex: 0 30px;
+  background: darkgreen;
+  text-align: center;
+  font-size: 10px;
+}
+
+main {
+  flex: 1;
+  color: black;
+  font-size: 30px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-height: 300px) {
+  header {
+    display: none;
+  }
+  footer {
+    display: none;
+  }
+}
