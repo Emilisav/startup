@@ -62,7 +62,7 @@
   z-index | number | 100 | Controls the positioning of the element on the z axis
 
   - Units
-  __Unit__ |	__Description__
+  **Unit** |	**Description**
   --- | ---
   px |	The number of pixels
   pt |	The number of points (1/72 of an inch)
@@ -78,7 +78,7 @@
   vmax |	A percentage of the viewport's larger dimension
 
   - Color
-  __Method__ |	__Example__ | __Description__
+  **Method** |	**Example** | **Description**
   ---|---|---
   keyword | red |	A set of predefined colors (e.g. white, cornflowerblue, darkslateblue)
 RGB | hex |	#00FFAA22 or #0FA2	Red, green, and blue as a hexadecimal number, with an optional alpha opacity
