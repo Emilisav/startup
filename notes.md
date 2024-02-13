@@ -103,6 +103,7 @@
   } ```
 
 - Animation
+
 ```css
 p {
   text-align: center;
