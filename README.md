@@ -54,7 +54,7 @@ For this deliverable I built out the structure of my application using HTML.
 
 # CSS delivarables
 
-- **Prerequisite**: Simon CSS is deployed to ![simon.talkshow.click](https://simon.talkshow.click/)
+- **Prerequisite**: Simon CSS is deployed to [simon.talkshow.click](https://simon.talkshow.click/)
 - **Prerequisite**: A link to this GitHub startup repository is displayed on my application's home page
 - **Prerequisite**: These notes in this startup Git repository README.md file documenting what I modified and added with this deliverable
 - **Prerequisite**: At least 10 git commits spread consistently throughout the assignment period.
