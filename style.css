@@ -41,7 +41,7 @@ main {
   flex-direction: column;
 }
 
-p {
+#title {
   flex: 0 50px;
   justify-content: center;
   text-align: center;
@@ -55,16 +55,13 @@ div {
 
 #right {
   flex: 1 0.5%;
-  background-color: aquamarine;
+  display: flex;
+  flex-direction: column;
 }
 
 button {
-  padding-top: 10%;
-  padding-bottom: 10%;
-  display: block;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 8vh;
+  margin: 10px;
+  flex: 1;
 }
 
 #left {
@@ -72,16 +69,42 @@ button {
   display: flex;
   flex-direction: column;
   background-color: aqua;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 #name {
+  flex: 0 20px;
   align-self: center;
-  font-size: 10vh;
+  justify-content: center;
 }
 
 #psw {
+  flex: 0 20px;
   align-self: center;
+}
+
+#top {
+  flex: 1 0.5%;
+  display: flex;
+  flex-direction: column;
+  background-color: aqua;
+  overflow: scroll;
+}
+
+#add {
+  flex: 1 0.5%;
+  display: flex;
+  flex-direction: column;
+}
+
+#new {
+  flex: 0 50px;
+  justify-content: center;
+  text-align: center;
+}
+
+img {
+  flex: 0 8vh;
 }
 
 @media (max-height: 400px) {
@@ -91,10 +114,17 @@ button {
   footer {
     display: none;
   }
+  img {
+    display: none;
+  }
 }
 
 @media (max-width: 700px) {
   div {
     flex-direction: column;
+  }
+
+  img {
+    display: none;
   }
 }
