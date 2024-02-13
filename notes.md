@@ -89,9 +89,9 @@
 
 - Displays
    - none, block, inline, flex, grid
-   - '<meta name="viewport" content="width=device-width,initial-scale=1" />'
+   - `<meta name="viewport" content="width=device-width,initial-scale=1" />`
     
-'''css
+```css
 @media (orientation: portrait) {
   div {
     transform: rotate(270deg);
@@ -100,7 +100,7 @@
 @media (orientation: portrait) {
   aside {
     display: none;
-  } '''
+  } ```
 
 - Animation
 ```css
@@ -121,7 +121,7 @@ p {
     font-size: 20vh;
   }
 }
-'''
+```
 
 - Grid
 
@@ -170,7 +170,7 @@ section:nth-child(2) {
 
 - Bootstrap
 
-'''html
+```html
   <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -192,4 +192,4 @@ section:nth-child(2) {
   ></script>
 </body>
 </html>
-'''
+```
