@@ -89,8 +89,10 @@
 
 - Displays
     -none, block, inline, flex, grid
-    - <meta name="viewport" content="width=device-width,initial-scale=1" />
-''' @media (orientation: portrait) {
+    - '<meta name="viewport" content="width=device-width,initial-scale=1" />'
+    
+'''css
+@media (orientation: portrait) {
   div {
     transform: rotate(270deg);
   }
@@ -109,7 +111,7 @@ p {
   animation-name: demo;
   animation-duration: 3s;
 }
-css
+
 @keyframes demo {
   from {
     font-size: 0vh;
@@ -120,3 +122,75 @@ css
   }
 }
 '''
+
+- Grid
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-auto-rows: 300px;
+  grid-gap: 1em;
+}
+```
+- Flex
+
+
+```css
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  height: 100vh;
+}
+header {
+  flex: 0 80px;
+  background: hsl(223, 57%, 38%);
+}
+
+footer {
+  flex: 0 30px;
+  background: hsl(180, 10%, 10%);
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+section:nth-child(1) {
+  flex: 1;
+  background-color: hsl(180, 10%, 80%);
+}
+section:nth-child(2) {
+  flex: 3;
+  background-color: white;
+}
+```
+- Bootstrap
+
+'''html
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+  </head>
+<body>
+  <button type="button" class="btn btn-primary">Bootstrap</button>
+
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+    crossorigin="anonymous"
+  ></script>
+</body>
+</html>
+
+    '''
