@@ -62,25 +62,39 @@
   z-index | number | 100 | Controls the positioning of the element on the z axis
 
   - Units
-  **Unit** |	**Description**
-  --- | ---
-  px |	The number of pixels
-  pt |	The number of points (1/72 of an inch)
-  in |	The number of inches
-  cm |	The number of centimeters
-  % |	A percentage of the parent element
-  em |	A multiplier of the width of the letter m in the     parent's font
-  rem |	A multiplier of the width of the letter m in the root's   font
-  ex |	A multiplier of the height of the element's font
-  vw |	A percentage of the viewport's width
-  vh |	A percentage of the viewport's height
-  vmin |	A percentage of the viewport's smaller dimension
-  vmax |	A percentage of the viewport's larger dimension
+| Unit | Description                                                      |
+| ---- | ---------------------------------------------------------------- |
+| px   | The number of pixels                                             |
+| pt   | The number of points (1/72 of an inch)                           |
+| in   | The number of inches                                             |
+| cm   | The number of centimeters                                        |
+| %    | A percentage of the parent element                               |
+| em   | A multiplier of the width of the letter `m` in the parent's font |
+| rem  | A multiplier of the width of the letter `m` in the root's font   |
+| ex   | A multiplier of the height of the element's font                 |
+| vw   | A percentage of the viewport's width                             |
+| vh   | A percentage of the viewport's height                            |
+| vmin | A percentage of the viewport's smaller dimension                 |
+| vmax | A percentage of the viewport's larger dimension                  |
 
   - Color
-  **Method** |	**Example** | **Description**
-  ---|---|---
-  keyword | red |	A set of predefined colors (e.g. white, cornflowerblue, darkslateblue)
-  RGB | hex |	#00FFAA22 or #0FA2	Red, green, and blue as a hexadecimal number, with an optional alpha opacity
-  RGB | function	| rgb(128, 255, 128, 0.5)	Red, green, and blue as a percentage or number between 0 and 255, with an optional alpha opacity percentage
-  HSL	| hsl(180, 30%, 90%, 0.5)	| Hue, saturation, and light, with an optional opacity percentage. Hue is the position on the 365 degree color wheel (red is 0 and 255). Saturation is how gray the color is, and light is how bright the color is.
+| Method       | Example                   | Description                                                                                                                                                                                                       |
+| ------------ | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| keyword      | `red`                     | A set of predefined colors (e.g. white, cornflowerblue, darkslateblue)                                                                                                                                            |
+| RGB hex      | `#00FFAA22` or `#0FA2`    | Red, green, and blue as a hexadecimal number, with an optional alpha opacity                                                                                                                                      |
+| RGB function | `rgb(128, 255, 128, 0.5)` | Red, green, and blue as a percentage or number between 0 and 255, with an optional alpha opacity percentage                                                                                                       |
+| HSL          | `hsl(180, 30%, 90%, 0.5)` | Hue, saturation, and light, with an optional opacity percentage. Hue is the position on the 365 degree color wheel (red is 0 and 255). Saturation is how gray the color is, and light is how bright the color is. |
+
+- Displays
+    -none, block, inline, flex, grid
+    - <meta name="viewport" content="width=device-width,initial-scale=1" />
+    -'''@media (orientation: portrait) {
+  div {
+    transform: rotate(270deg);
+  }
+}
+@media (orientation: portrait) {
+  aside {
+    display: none;
+  }
+}'''
