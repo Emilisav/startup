@@ -9,7 +9,6 @@
 body {
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 
 header {
@@ -41,51 +40,36 @@ main {
   flex-direction: column;
 }
 
-#title {
-  flex: 0 50px;
-  justify-content: center;
-  text-align: center;
+#back {
+  float: right;
 }
 
-div {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
+/* Rating Star Widgets Style */
+.rating-stars ul {
+  list-style-type: none;
+  padding: 0;
+
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+.rating-stars ul > li.star {
+  display: inline-block;
 }
 
-#right {
-  flex: 1 0.5%;
-  display: flex;
-  flex-direction: column;
+/* Idle State of the stars */
+.rating-stars ul > li.star > i.fa {
+  font-size: 2.5em; /* Change the size of the stars */
+  color: #ccc; /* Color on idle state */
 }
 
-button {
-  margin: 10px;
-  flex: 1;
+/* Hover state of the stars */
+.rating-stars ul > li.star.hover > i.fa {
+  color: #ffcc36;
 }
 
-#left {
-  flex: 1 0.5%;
-  display: flex;
-  flex-direction: column;
-  background-color: aqua;
-  overflow: scroll;
-}
-
-#name {
-  flex: 0 20px;
-  align-self: center;
-  justify-content: center;
-}
-
-#psw {
-  flex: 0 20px;
-  align-self: center;
-}
-
-
-img {
-  flex: 0 8vh;
+/* Selected state of the stars */
+.rating-stars ul > li.star.selected > i.fa {
+  color: #ff912c;
 }
 
 @media (max-height: 400px) {
