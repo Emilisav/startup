@@ -88,8 +88,8 @@
 | HSL          | `hsl(180, 30%, 90%, 0.5)` | Hue, saturation, and light, with an optional opacity percentage. Hue is the position on the 365 degree color wheel (red is 0 and 255). Saturation is how gray the color is, and light is how bright the color is. |
 
 - Displays
-    -none, block, inline, flex, grid
-    - '<meta name="viewport" content="width=device-width,initial-scale=1" />'
+   - none, block, inline, flex, grid
+   - '<meta name="viewport" content="width=device-width,initial-scale=1" />'
     
 '''css
 @media (orientation: portrait) {
@@ -167,6 +167,7 @@ section:nth-child(2) {
   background-color: white;
 }
 ```
+
 - Bootstrap
 
 '''html
@@ -184,7 +185,6 @@ section:nth-child(2) {
 <body>
   <button type="button" class="btn btn-primary">Bootstrap</button>
 
-
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
@@ -192,5 +192,4 @@ section:nth-child(2) {
   ></script>
 </body>
 </html>
-
-    '''
+'''
