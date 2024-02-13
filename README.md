@@ -52,3 +52,16 @@ For this deliverable I built out the structure of my application using HTML.
 - __Database__ Questions and rating stored stored in the database
 - __WebSocket__ Shows new questions at bottom of questions page
 
+# CSS delivarables
+
+- **Prerequisite**: Simon CSS is deployed to ![simon.talkshow.click](https://simon.talkshow.click/)
+- **Prerequisite**: A link to this GitHub startup repository is displayed on my application's home page
+- **Prerequisite**: These notes in this startup Git repository README.md file documenting what I modified and added with this deliverable
+- **Prerequisite**: At least 10 git commits spread consistently throughout the assignment period.
+- Properly styled CSS
+  - 30% Header, footer, and main content body is present
+  - 20% Navigation elements is present
+  - 10% Responsive to window resizing is present
+  - 20% Application elements are present
+  - 10% Application text content are present
+  - 10% Application image is present
