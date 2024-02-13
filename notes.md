@@ -62,6 +62,7 @@
   z-index | number | 100 | Controls the positioning of the element on the z axis
 
   - Units
+  
 | Unit | Description                                                      |
 | ---- | ---------------------------------------------------------------- |
 | px   | The number of pixels                                             |
@@ -78,6 +79,7 @@
 | vmax | A percentage of the viewport's larger dimension                  |
 
   - Color
+
 | Method       | Example                   | Description                                                                                                                                                                                                       |
 | ------------ | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | keyword      | `red`                     | A set of predefined colors (e.g. white, cornflowerblue, darkslateblue)                                                                                                                                            |
@@ -88,7 +90,7 @@
 - Displays
     -none, block, inline, flex, grid
     - <meta name="viewport" content="width=device-width,initial-scale=1" />
-    -'''@media (orientation: portrait) {
+''' @media (orientation: portrait) {
   div {
     transform: rotate(270deg);
   }
@@ -96,5 +98,25 @@
 @media (orientation: portrait) {
   aside {
     display: none;
+  } '''
+
+- Animation
+```css
+p {
+  text-align: center;
+  font-size: 20vh;
+
+  animation-name: demo;
+  animation-duration: 3s;
+}
+css
+@keyframes demo {
+  from {
+    font-size: 0vh;
   }
-}'''
+
+  to {
+    font-size: 20vh;
+  }
+}
+'''
