@@ -13,7 +13,7 @@ body {
 
 header {
   flex: 0 50px;
-  background: darkblue;
+  background: blue;
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -26,9 +26,25 @@ h1 {
 
 footer {
   flex: 0 30px;
-  background: darkgreen;
-  text-align: center;
-  font-size: 10px;
+  background: lightblue;
+  font-size: 20px;
+  display: flex;
+}
+
+.fade {
+  display: none;
+}
+
+#git {
+  flex: 0.5;
+  align-self: flex-start;
+  text-align: left;
+  justify-content: center;
+}
+
+#name {
+  text-align: right;
+  justify-content: center;
 }
 
 main {
@@ -44,35 +60,55 @@ main {
   float: right;
 }
 
-/* Rating Star Widgets Style */
-.rating-stars ul {
-  list-style-type: none;
-  padding: 0;
-
-  -moz-user-select: none;
-  -webkit-user-select: none;
-}
-.rating-stars ul > li.star {
-  display: inline-block;
+#v-pills-home {
+  display: flex;
+  flex-direction: row;
+  background: palegoldenrod;
 }
 
-/* Idle State of the stars */
-.rating-stars ul > li.star > i.fa {
-  font-size: 2.5em; /* Change the size of the stars */
-  color: #ccc; /* Color on idle state */
+#list {
+    flex: 1;
+    background: blanchedalmond;
 }
 
-/* Hover state of the stars */
-.rating-stars ul > li.star.hover > i.fa {
-  color: #ffcc36;
+#stars {
+    flex: 0 30px;
 }
 
-/* Selected state of the stars */
-.rating-stars ul > li.star.selected > i.fa {
-  color: #ff912c;
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
 }
 
-@media (max-height: 400px) {
+.container {
+  display: inline;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.container svg {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 50px;
+  width: 50px;
+  transition: all 0.3s;
+  fill: #666;
+}
+
+.container svg:hover {
+  transform: scale(1.1);
+}
+
+.container input:checked ~ svg {
+  fill: #ffeb49;
+}
+
+@media (max-height: 600px) {
   header {
     display: none;
   }

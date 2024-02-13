@@ -14,22 +14,25 @@ body {
 
 header {
   flex: 0 50px;
-  background: darkblue;
+  background: blue;
   display: flex;
   flex-direction: row;
-  justify-content: start;
+  justify-content: center;
+  text-align: center;
 }
-
 h1 {
   padding-left: 10px;
   font-size: 20px;
+  color: white;
+  justify-self: center;
 }
 
 footer {
   flex: 0 30px;
-  background: darkgreen;
+  background: lightblue;
   text-align: center;
   font-size: 10px;
+  font-family: "Encode Sans";
 }
 
 main {
@@ -68,21 +71,18 @@ button {
   flex: 1 0.5%;
   display: flex;
   flex-direction: column;
-  background-color: aqua;
-  overflow: scroll;
 }
 
 #name {
-  flex: 0 20px;
+  flex: 0 0.2%;
   align-self: center;
   justify-content: center;
 }
 
 #psw {
-  flex: 0 20px;
+  flex: 0 0.2%;
   align-self: center;
 }
-
 
 img {
   flex: 0 8vh;
