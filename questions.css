@@ -43,6 +43,10 @@ main {
   overflow-y: scroll;
 }
 
+.mb-3 {
+  margin-top: 50px;
+}
+
 .container input {
   opacity: 0;
   cursor: pointer;

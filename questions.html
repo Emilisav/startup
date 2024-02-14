@@ -69,7 +69,7 @@
           >
             <div class="accordion-body">
               <div id="top">
-                <h2>These are the top questions:</h2>
+                <h2>These are the top questions</h2>
                 <table class="table">
                   <tr>
                     <td data-th="Question">
@@ -672,28 +672,36 @@
           >
             <div class="accordion-body">
               <div id="add">
-                <h1>Add a question:</h1>
-
+                <h1>Add a question</h1>
                 <form method="post" action="questions.html">
-                  <label for="question">Question</label>
-                  <input
-                    type="text"
-                    required
-                    class="question"
-                    placeholder="Your question here"
-                  />
-
+                  <div class="mb-3">
+                    <label for="formGroupExampleInput" class="form-label"
+                      >Question</label
+                    >
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      id="formGroupExampleInput"
+                      placeholder="Your question here"
+                    />
+                  </div>
                   <button type="submit">Add Question</button>
                 </form>
 
                 <form method="post" action="questions.html">
-                  <label for="questionHelp">Get help from chatGPT</label>
-                  <input
-                    type="text"
-                    required
-                    id="questionHelp"
-                    placeholder="What do I ask someone who like oranges to discover what else they like?"
-                  />
+                  <div class="mb-3">
+                    <label for="formGroupExampleInput2" class="form-label"
+                      >Get help from chatGPT</label
+                    >
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      id="formGroupExampleInput2"
+                      placeholder="What do I ask someone who like oranges to discover what else they like?"
+                    />
+                  </div>
 
                   <button type="submit">Call ChatGPT</button>
                 </form>
@@ -722,7 +730,7 @@
           >
             <div class="accordion-body">
               <div id="new">
-                <h2>These are the newest questions!</h2>
+                <h2>These are the latest questions!</h2>
                 <table class="table">
                   <tr>
                     <td data-th="Question">
