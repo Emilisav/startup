@@ -10,7 +10,6 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow-y: scroll;
 }
 
 header {
@@ -18,19 +17,30 @@ header {
   background: blue;
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
-h1 {
-  flex: 1;
+.navbar.bg-body-tertiary {
+  flex: 0 400px;
   padding-left: 10px;
   font-size: 20px;
   justify-content: start;
-  background: palegreen;
+}
+
+#title {
+  color: whitesmoke;
 }
 
 #back {
-  flex: 0;
+  flex: 1;
   margin-right: 10px;
+  text-align: end;
+  top: 50%;
+}
+
+main {
+  flex: 1;
+  overflow-y: scroll;
 }
 
 .container input {
@@ -43,7 +53,7 @@ h1 {
 .container {
   display: inline;
   position: relative;
-
+  padding: 0;
   cursor: pointer;
   user-select: none;
 }
@@ -71,24 +81,32 @@ span.stars {
   white-space: nowrap;
 }
 
+.accordion-button {
+  font-size: x-large;
+  color: cornflowerblue;
+}
+
 footer {
   flex: 0 30px;
   background: lightblue;
-  font-size: 20px;
+  font-size: 15px;
+  font-family: "Encode Sans";
   display: flex;
+  align-items: center;
 }
 
-#git {
-  flex: 0.5;
-  align-self: flex-start;
+footer span {
+  flex: 0 150px;
   text-align: left;
-  justify-content: center;
+  margin-left: 10px;
 }
 
-#name {
+footer a {
+  flex: 1;
   text-align: right;
-  justify-content: center;
+  margin-right: 10px;
 }
+
 @media (max-height: 600px) {
   header {
     display: none;
@@ -104,10 +122,6 @@ footer {
 @media (max-width: 700px) {
   div {
     flex-direction: column;
-  }
-
-  img {
-    display: none;
   }
 }
 

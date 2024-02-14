@@ -19,6 +19,7 @@ header {
   flex-direction: row;
   justify-content: center;
   text-align: center;
+  align-items: center;
 }
 h1 {
   padding-left: 10px;
@@ -30,9 +31,22 @@ h1 {
 footer {
   flex: 0 30px;
   background: lightblue;
-  text-align: center;
-  font-size: 10px;
+  font-size: 15px;
   font-family: "Encode Sans";
+  display: flex;
+  align-items: center;
+}
+
+footer span {
+  flex: 0 150px;
+  text-align: left;
+  margin-left: 10px;
+}
+
+footer a {
+  flex: 1;
+  text-align: right;
+  margin-right: 10px;
 }
 
 main {
