@@ -54,14 +54,15 @@ For this deliverable I built out the structure of my application using HTML.
 
 # CSS delivarables
 
-☑ - done - **Prerequisite**: Simon CSS is deployed to [simon.talkshow.click](https://simon.talkshow.click/)
-☑ - done - **Prerequisite**: A link to this GitHub startup repository is displayed at the bottom left of my application's home page
-☑ - done - **Prerequisite**: These notes in this startup Git repository README.md file documenting what I modified and added with this deliverable
-☑ - done - **Prerequisite**: At least 10 git commits spread consistently throughout the assignment period.
-☑ - done - Properly styled CSS
-  - 30% Header, footer, and main content body is present
-  - 20% Navigation elements is present
-  - 10% Responsive to window resizing is present
-  - 20% Application accordion is present 
-  - 10% Application text content showing questions are present
-  - 10% Application image is present in title and web page
+☑ - done **Prerequisite**: Simon CSS is deployed to [simon.talkshow.click](https://simon.talkshow.click/)
+
+☑ - done **Prerequisite**: A link to this GitHub startup repository is displayed at the bottom left of my application's home page
+☑ - done **Prerequisite**: These notes in this startup Git repository README.md file documenting what I modified and added with this deliverable
+☑ - done **Prerequisite**: At least 10 git commits spread consistently throughout the assignment period.
+☑ - done Properly styled CSS
+      - 30% Header, footer, and main content body is present
+      - 20% Navigation elements is present
+      - 10% Responsive to window resizing is present
+      - 20% Application accordion is present 
+      - 10% Application text content showing questions are present
+      - 10% Application image is present in title and web page
