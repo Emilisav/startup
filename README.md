@@ -65,3 +65,13 @@ For this deliverable I built out the structure of my application using HTML.
       - 20% Application accordion is present 
       - 10% Application text content showing questions are present
       - 10% Application image is present in title and web page
+
+      - [ ] Mercury
+- [x] Venus
+- [x] Earth (Orbit/Moon)
+- [x] Mars
+- [ ] Jupiter
+- [ ] Saturn
+- [ ] Uranus
+- [ ] Neptune
+- [ ] Comet Haley
