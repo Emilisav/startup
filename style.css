@@ -10,6 +10,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background: floralwhite;
 }
 
 header {
@@ -28,6 +29,10 @@ h1 {
   justify-self: center;
 }
 
+.btn-outline-primary {
+  font-size: 5em;
+  background: white;
+}
 footer {
   flex: 0 30px;
   background: lightblue;
