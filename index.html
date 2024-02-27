@@ -26,7 +26,7 @@
       <p id="title">Login to add questions or use a guest account</p>
 
       <div>
-        <form method="get" id="left" id="questions.html">
+        <form method="get" id="left" action="questions.html">
           <label for="name" id="name">Name</label>
           <input type="text" required id="name" placeholder="Your name here" />
 
@@ -48,14 +48,9 @@
         </form>
 
         <form method="get" id="right" action="questions.html">
-          <button
-            class="btn btn-outline-primary"
-            type="submit"
-            onclick="guest()"
-          >
-            Guest
-          </button>
+          <button class="btn btn-outline-primary" type="submit">Guest</button>
         </form>
+
       </div>
     </main>
 
