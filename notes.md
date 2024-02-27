@@ -293,44 +293,6 @@ section:nth-child(2) {
 
 ![image](https://github.com/Emilisav/startup/assets/144365339/309b9565-e158-4d1e-a3d2-a2fd0f9ac79c)
 
--Await/async 
 
-Chmod +x program.sh makes script executable 
-
-Sudo. Ls –la (long all(hidden)) . Ssh 
-
-How to include js in script (onclick =’1+1’, script tag) 
-
-Valid Json {“x”:4} key is string, no undefined in Json, can have null, js Object and json same 
-
-QuerySleector adds to first one, Query sleecterAll adds to add 
-
-<div> division element 
-
-Hyperlink <a href=”htt....”>x</a> 
-
-Use CNAME to point to another DNS record( A is address maps host to address) (SOA startup auth who is DNS registrar)(TXT stick text and associate with host like giving google auth)(CNAME is alais map one host name to another host) 
-
-Div.header{color: blue😉 
-
-cPbm 
-
--Arrow syntax 
-
-DOM textContent sets the child text for an element, throws away all children and becomes only child 
-
-Load CSS from google @import url(“httppp..”) 
-
-How to create js funtion const f = function(x){}, const f=(x)=> {}, function f(x)={} 
-
-<ul> unordered list(<ol> ordered, <li> list element inside ol or ul) 
-
--v.match(/A|f/i)(/.../ is stuff and i means case insensitive) regular expressions 
-
-Js objects are sepreated by coloj 
-
-Tld – edu, root domaun byu.edu, cs33.cdd.dd subdomians 
-
-Columcn revsrese flex worls hello two riws 
 
  
