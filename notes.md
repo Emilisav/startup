@@ -248,3 +248,89 @@ section:nth-child(2) {
 | `video`   | Video content                                                          |
 | `svg`     | Scalable vector graphic content                                        |
 | `iframe`  | Inline frame of another HTML page                                      |
+
+
+- HTML input
+
+| Element    | Meaning                          | Example                                        |
+| ---------- | -------------------------------- | ---------------------------------------------- |
+| `form`     | Input container and submission   | `<form action="form.html" method="post">`      |
+| `fieldset` | Labeled input grouping           | `<fieldset> ... </fieldset>`                   |
+| `input`    | Multiple types of user input     | `<input type="" />`                            |
+| `select`   | Selection dropdown               | `<select><option>1</option></select>`          |
+| `optgroup` | Grouped selection dropdown       | `<optgroup><option>1</option></optgroup>`      |
+| `option`   | Selection option                 | `<option selected>option2</option>`            |
+| `textarea` | Multiline text input             | `<textarea></textarea>`                        |
+| `label`    | Individual input label           | `<label for="range">Range: </label>`           |
+| `output`   | Output of input                  | `<output for="range">0</output>`               |
+| `meter`    | Display value with a known range | `<meter min="0" max="100" value="50"></meter>` |
+
+| Type           | Meaning                           |
+| -------------- | --------------------------------- |
+| text           | Single line textual value         |
+| password       | Obscured password                 |
+| email          | Email address                     |
+| tel            | Telephone number                  |
+| url            | URL address                       |
+| number         | Numerical value                   |
+| checkbox       | Inclusive selection               |
+| radio          | Exclusive selection               |
+| range          | Range limited number              |
+| date           | Year, month, day                  |
+| datetime-local | Date and time                     |
+| month          | Year, month                       |
+| week           | Week of year                      |
+| color          | Color                             |
+| file           | Local file                        |
+| submit         | button to trigger form submission |
+
+| Attribute | Meaning                                                                             |
+| --------- | ----------------------------------------------------------------------------------- |
+| name      | The name of the input. This is submitted as the name of the input if used in a form |
+| disabled  | Disables the ability for the user to interact with the input                        |
+| value     | The initial value of the input                                                      |
+| required  | Signifies that a value is required in order to be valid                             |
+
+![image](https://github.com/Emilisav/startup/assets/144365339/309b9565-e158-4d1e-a3d2-a2fd0f9ac79c)
+
+-Await/async 
+
+Chmod +x program.sh makes script executable 
+
+Sudo. Ls –la (long all(hidden)) . Ssh 
+
+How to include js in script (onclick =’1+1’, script tag) 
+
+Valid Json {“x”:4} key is string, no undefined in Json, can have null, js Object and json same 
+
+QuerySleector adds to first one, Query sleecterAll adds to add 
+
+<div> division element 
+
+Hyperlink <a href=”htt....”>x</a> 
+
+Use CNAME to point to another DNS record( A is address maps host to address) (SOA startup auth who is DNS registrar)(TXT stick text and associate with host like giving google auth)(CNAME is alais map one host name to another host) 
+
+Div.header{color: blue😉 
+
+cPbm 
+
+-Arrow syntax 
+
+DOM textContent sets the child text for an element, throws away all children and becomes only child 
+
+Load CSS from google @import url(“httppp..”) 
+
+How to create js funtion const f = function(x){}, const f=(x)=> {}, function f(x)={} 
+
+<ul> unordered list(<ol> ordered, <li> list element inside ol or ul) 
+
+-v.match(/A|f/i)(/.../ is stuff and i means case insensitive) regular expressions 
+
+Js objects are sepreated by coloj 
+
+Tld – edu, root domaun byu.edu, cs33.cdd.dd subdomians 
+
+Columcn revsrese flex worls hello two riws 
+
+ 
