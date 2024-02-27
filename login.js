@@ -7,3 +7,11 @@ function login() {
 
   window.location.href = "questions.html";
 }
+
+function guest() {
+  let name = Math.random() * 999;
+
+  localStorage.setItem("userName", name.value);
+
+  window.location.href = "questions.html";
+}
