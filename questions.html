@@ -673,7 +673,7 @@
             <div class="accordion-body">
               <div id="add">
                 <h1>Add a question</h1>
-                <form method="post" action="questions.html">
+                <form>
                   <div class="mb-3">
                     <label for="formGroupExampleInput" class="form-label"
                       >Question</label
@@ -686,7 +686,9 @@
                       placeholder="Your question here"
                     />
                   </div>
-                  <button type="submit">Add Question</button>
+                  <button type="submit" onclick="addQuestion">
+                    Add Question
+                  </button>
                 </form>
 
                 <form method="post" action="questions.html">

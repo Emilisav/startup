@@ -56,3 +56,17 @@ function setStars(numStars, star) {
     }
   }
 }
+
+function addQuestion(question) {
+  let userName = getName();
+  let time = new Date().getDate;
+
+  let questionText = localStorage.getItem("scores");
+  if (questionText) {
+    let questions = JSON.parse(questionText);
+  }
+
+  questions.push({ question: question, userName: userName, date: time });
+
+  localStorage.setItem("questions", JSON.stringify(questions));
+}
