@@ -12,8 +12,11 @@ topQuestions();
 setTitle();
 
 function getName() {
-  if (localStorage.getItem("userName") == null) {
-    localStorage.setItem("userName", `Guest${Math.random() * 999}`);
+  if (
+    localStorage.getItem("userName") == "undefined" ||
+    localStorage.getItem("userName") == null
+  ) {
+    localStorage.setItem("userName", `Guest${Math.floor(Math.random() * 999)}`);
   }
 
   return localStorage.getItem("userName");
@@ -21,7 +24,7 @@ function getName() {
 
 function setTitle() {
   let title = document.getElementById("title");
-  title.innerText = "Welcome to TalkShow " + getName();
+  title.innerText = "Welcome to TalkShow " + getName() + "!";
 }
 
 // Simulate chat messages that will come over WebSocket
