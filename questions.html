@@ -671,40 +671,32 @@
             <div class="accordion-body">
               <div id="add">
                 <h1>Add a question</h1>
-                <form>
-                  <div class="mb-3">
-                    <label for="formGroupExampleInput" class="form-label"
-                      >Question</label
-                    >
-                    <input
-                      type="text"
-                      required
-                      class="form-control"
-                      id="formGroupExampleInput"
-                      placeholder="Your question here"
-                    />
-                  </div>
-                  <button type="submit" onclick="addQuestion">
-                    Add Question
-                  </button>
-                </form>
+                <div class="mb-3">
+                  <label class="form-label">Question</label>
+                  <input
+                    onfocus="this.value=''"
+                    type="text"
+                    required
+                    class="form-control"
+                    id="addQuestion"
+                    placeholder="Your question here"
+                  />
+                </div>
+                <button type="submit" onclick="question()">Add Question</button>
 
-                <form method="post" action="questions.html">
-                  <div class="mb-3">
-                    <label for="formGroupExampleInput2" class="form-label"
-                      >Get help from chatGPT</label
-                    >
-                    <input
-                      type="text"
-                      required
-                      class="form-control"
-                      id="formGroupExampleInput2"
-                      placeholder="What do I ask someone who like oranges to discover what else they like?"
-                    />
-                  </div>
+                <div class="mb-3">
+                  <label class="form-label">Get help from chatGPT</label>
+                  <input
+                    onfocus="this.value=''"
+                    type="text"
+                    required
+                    class="form-control"
+                    id="helpQuestion"
+                    placeholder="What do I ask someone who like oranges to discover what else they like?"
+                  />
+                </div>
 
-                  <button type="submit">Call ChatGPT</button>
-                </form>
+                <button type="submit" onclick="chatGPT()">Call ChatGPT</button>
               </div>
             </div>
           </div>
