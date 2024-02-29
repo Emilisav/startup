@@ -1,15 +1,20 @@
 // Populate Questions
 
-addQuestion(`What number would you like to be on a sports team and
-                      why?`);
-addQuestion(`Since events seem to always happen in threes, what is
-                      the next thing to happen to you?`);
+//TODO
+localStorage.setItem("questions", []);
+
+addQuestion(`What number would you like to be on a sports team and why?`);
+addQuestion(
+  `Since events seem to always happen in threes, what is the next thing to happen to you?`
+);
 addQuestion(`What type of books do you take on vacation?`);
 addQuestion(`What event do you wish you had season tickets to?`);
 addQuestion(`What's your gift?`);
 
 topQuestions();
 setTitle();
+
+setInterval(getNewestQuestions, 3000);
 
 function getName() {
   if (
@@ -27,25 +32,26 @@ function setTitle() {
   title.innerText = "Welcome to TalkShow " + getName() + "!";
 }
 
-// Simulate chat messages that will come over WebSocket
-setInterval(getNewestQuestions, 5000);
-
-async function getNewestQuestions() {
-  let questions = localStorage.getItem("questions");
-
+function getNewestQuestions() {
   // Populate Questions
-  addQuestion(`A new question ` + Math.floor(Math.random() * 3000));
+  addQuestion(`new question ` + Math.floor(Math.random() * 3000));
 
+  let questions = localStorage.getItem("questions");
+  if (questions) {
+    questions = JSON.parse(questions);
+  } else {
+    questions = [];
+  }
   setStars(Math.round(Math.random() * 5), "s1");
   let questionText = document.getElementById("newQuestion1");
   questionText.innerHTML = questions[2].question;
 
   setStars(Math.round(Math.random() * 5), "s2");
-  questionText = document.getElementById("newQuestion1");
+  questionText = document.getElementById("newQuestion2");
   questionText.innerHTML = questions[1].question;
 
   setStars(Math.round(Math.random() * 5), "s3");
-  questionText = document.getElementById("newQuestion1");
+  questionText = document.getElementById("newQuestion3");
   questionText.innerHTML = questions[0].question;
 }
 
@@ -67,20 +73,25 @@ function setStars(numStars, star) {
 
 function addQuestion(question) {
   let userName = getName();
-  let time = new Date().getDate;
+  let time = Date.now();
   let stars = 0;
 
   let questionText = localStorage.getItem("questions");
-  questions = JSON.parse(questionText);
-
+  if (questionText) {
+    questions = JSON.parse(questionText);
+  } else {
+    questions = [];
+  }
   questions.push({
     question: question,
     userName: userName,
     stars: stars,
     date: time,
   });
-  questions.sort((a, b) => a.date - b.date);
 
+  if (questions.length > 2) {
+    questions.sort((a, b) => b.date - a.date);
+  }
   localStorage.setItem("questions", JSON.stringify(questions));
 }
 
