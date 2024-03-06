@@ -65,3 +65,14 @@ For this deliverable I built out the structure of my application using HTML.
 - [x] done Application accordion is present 
 - [x] done Application text content showing questions are present
 - [x] done Application image is present in title and web page
+
+# JS delivarables
+- [x] done Prerequisite: Simon JavaScript deployed to my production environment
+- [x] done Prerequisite: A link to your GitHub startup repository prominently displayed on my application's home page
+- [x] done Prerequisite: These notes in your startup Git repository README.md file documenting what I modified and added with this deliverable
+- [x] done Prerequisite: At least 10 git commits spread throughout the assignment period
+- [x] done Significant use of JavaScript to create a viable working application
+- [x] done 20% JavaScript support for future login on login.js
+- [x] done 20% JavaScript support for future database data on login.js and questions.js
+- [x] done 20% JavaScript support for future WebSocket on latest quesions
+- [x] done 40% JavaScript support for your application's interaction logic on questions.js
