@@ -1,15 +1,6 @@
 // Populate Questions
 try {
-  //TODO
-  localStorage.setItem("questions", []);
-
-  addQuestion(`What number would you like to be on a sports team and why?`);
-  addQuestion(
-    `Since events seem to always happen in threes, what is the next thing to happen to you?`
-  );
-  addQuestion(`What type of books do you take on vacation?`);
-  addQuestion(`What event do you wish you had season tickets to?`);
-  addQuestion(`What's your gift?`);
+  //localStorage.setItem("questions", []);
 
   topQuestions();
   setTitle();
@@ -87,6 +78,7 @@ try {
     let userName = getName();
     let time = Date.now();
     let stars = 0;
+    let ratings = 0;
 
     let questionText = localStorage.getItem("questions");
     if (questionText) {
@@ -100,6 +92,7 @@ try {
         question: question,
         userName: userName,
         stars: stars,
+        numRatings: ratings,
         date: time,
       });
 
@@ -114,10 +107,22 @@ try {
 
   function topQuestions() {
     let questionText = localStorage.getItem("questions");
-
-    let questions = JSON.parse(questionText);
-
-    questions.sort((a, b) => b.stars - a.stars);
+    let questions = null;
+    try {
+      questions = JSON.parse(questionText);
+      questions.sort((a, b) => b.stars - a.stars);
+    } catch {
+      addQuestion(`What number would you like to be on a sports team and why?`);
+      addQuestion(
+        `Since events seem to always happen in threes, what is the next thing to happen to you?`
+      );
+      addQuestion(`What type of books do you take on vacation?`);
+      addQuestion(`What event do you wish you had season tickets to?`);
+      addQuestion(`What's your gift?`);
+      questionText = localStorage.getItem("questions");
+      questions = JSON.parse(questionText);
+      questions.sort((a, b) => b.stars - a.stars);
+    }
 
     for (let i = 0; i < 5; i++) {
       updateTopQuestion(questions[i], "q" + (i + 1));
@@ -146,6 +151,28 @@ try {
           "What do I ask someone who like oranges to discover what else they like?"),
       10000
     );
+  }
+
+  function star(id) {
+    star = document.getElementById(id);
+    question = document.getElementById(id.substring(0, 2));
+    questionsTxt = localStorage.getItem("questions");
+    let questions = JSON.parse(questionsTxt);
+
+    qElement = questions.find(
+      (q) => q.question === question.innerText.substr(3)
+    );
+
+    if (star.checked) {
+      qElement.stars =
+        (qElement.stars * qElement.numRatings + 1) / (qElement.numRatings + 1);
+      qElement.numRatings++;
+    } else {
+      qElement.stars =
+        (qElement.stars * qElement.numRatings - 1) / (qElement.numRatings + 1);
+      qElement.numRatings++;
+    }
+    localStorage.setItem("questions", JSON.stringify(questions));
   }
 } catch {
   console.log("Error");
