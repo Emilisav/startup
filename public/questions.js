@@ -31,12 +31,7 @@ try {
     try {
       addQuestion(`new question ` + Math.floor(Math.random() * 3000));
     } catch {}
-    let questions = localStorage.getItem("questions");
-    if (questions) {
-      questions = JSON.parse(questions);
-    } else {
-      questions = [];
-    }
+    let questions = loadQuestions();
 
     updateNewQuestion(questions[2], "1");
     updateNewQuestion(questions[1], "2");
@@ -71,7 +66,16 @@ try {
   }
 
   function checkQuestion(question) {
-    return true;
+    let questions = loadQuestions();
+
+    let found = false;
+    for (let i = 0; i < questions.length; i++) {
+      if (questions[i].question == question) {
+        found = true;
+      }
+    }
+
+    return found;
   }
 
   function addQuestion(question) {
@@ -80,12 +84,7 @@ try {
     let stars = 0;
     let ratings = 0;
 
-    let questionText = localStorage.getItem("questions");
-    if (questionText) {
-      questions = JSON.parse(questionText);
-    } else {
-      questions = [];
-    }
+    let questions = loadQuestions();
 
     if (checkQuestion(question)) {
       questions.push({
@@ -102,14 +101,14 @@ try {
     } else {
       throw question;
     }
-    localStorage.setItem("questions", JSON.stringify(questions));
+
+    updateQuestions(questions);
   }
 
   function topQuestions() {
-    let questionText = localStorage.getItem("questions");
-    let questions = null;
+    questions = loadQuestions();
+
     try {
-      questions = JSON.parse(questionText);
       questions.sort((a, b) => b.stars - a.stars);
     } catch {
       addQuestion(`What number would you like to be on a sports team and why?`);
@@ -119,8 +118,8 @@ try {
       addQuestion(`What type of books do you take on vacation?`);
       addQuestion(`What event do you wish you had season tickets to?`);
       addQuestion(`What's your gift?`);
-      questionText = localStorage.getItem("questions");
-      questions = JSON.parse(questionText);
+
+      questions = loadQuestions();
       questions.sort((a, b) => b.stars - a.stars);
     }
 
@@ -153,11 +152,10 @@ try {
     );
   }
 
-  function star(id) {
+  async function star(id) {
     star = document.getElementById(id);
     question = document.getElementById(id.substring(0, 2));
-    questionsTxt = localStorage.getItem("questions");
-    let questions = JSON.parse(questionsTxt);
+    let questions = loadQuestions;
 
     qElement = questions.find(
       (q) => q.question === question.innerText.substr(3)
@@ -172,8 +170,46 @@ try {
         (qElement.stars * qElement.numRatings - 1) / (qElement.numRatings + 1);
       qElement.numRatings++;
     }
-    localStorage.setItem("questions", JSON.stringify(questions));
+
+    await updateQuestions(questions);
   }
 } catch {
   console.log("Error");
+}
+
+async function loadQuestions() {
+  let questions = [];
+  try {
+    // Get the latest questions from the service
+    const response = await fetch("/api/questions");
+    questions = await response.json();
+
+    // Save the questions in case we go offline in the future
+    localStorage.setItem("questions", JSON.stringify(questions));
+  } catch {
+    // If there was an error then just use the last saved questions
+    const questionsText = localStorage.getItem("questions");
+    if (questionsText) {
+      questions = JSON.parse(questionsText);
+    } else {
+      questions = [];
+    }
+  }
+
+  return questions;
+}
+
+async function updateQuestions(newQuestions) {
+  try {
+    const response = await fetch("/api/questions", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(newQuestions),
+    });
+
+    // Store what the service gave us as the high scores
+    const questions = await response.json();
+  } catch {}
+
+  localStorage.setItem("questions", JSON.stringify(questions));
 }
