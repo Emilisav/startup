@@ -1,5 +1,5 @@
 {
-  "name": "cs260",
+  "name": "startup",
   "version": "1.0.0",
   "description": "[notes](./notes.md)\r [startup](https://startup.talkshow.click)\r [AWS](https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1)",
   "main": "index.js",
@@ -8,7 +8,15 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Emilisav/startup.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Emilisav/startup/issues"
+  },
+  "homepage": "https://github.com/Emilisav/startup#readme",
   "dependencies": {
     "express": "^4.18.3"
   }

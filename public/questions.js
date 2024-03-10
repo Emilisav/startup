@@ -1,180 +1,171 @@
 // Populate Questions
-try {
-  //localStorage.setItem("questions", []);
+//localStorage.setItem("questions", []);
 
-  topQuestions();
-  setTitle();
+topQuestions();
+setTitle();
 
-  setInterval(getNewestQuestions, 3000);
+setInterval(getNewestQuestions, 3000);
 
-  function getName() {
-    if (
-      localStorage.getItem("userName") == "undefined" ||
-      localStorage.getItem("userName") == null
-    ) {
-      localStorage.setItem(
-        "userName",
-        `Guest${Math.floor(Math.random() * 999)}`
-      );
-    }
-
-    return localStorage.getItem("userName");
+function getName() {
+  if (
+    localStorage.getItem("userName") == "undefined" ||
+    localStorage.getItem("userName") == null
+  ) {
+    localStorage.setItem("userName", `Guest${Math.floor(Math.random() * 999)}`);
   }
 
-  function setTitle() {
-    let title = document.getElementById("title");
-    title.innerText = "Welcome to TalkShow " + getName() + "!";
-  }
+  return localStorage.getItem("userName");
+}
 
-  function getNewestQuestions() {
-    // Populate Questions
-    try {
-      addQuestion(`new question ` + Math.floor(Math.random() * 3000));
-    } catch {}
-    let questions = loadQuestions();
+function setTitle() {
+  let title = document.getElementById("title");
+  title.innerText = "Welcome to TalkShow " + getName() + "!";
+}
 
-    updateNewQuestion(questions[2], "1");
-    updateNewQuestion(questions[1], "2");
-    updateNewQuestion(questions[0], "3");
-  }
+function getNewestQuestions() {
+  // Populate Questions
+  try {
+    addQuestion(`new question ` + Math.floor(Math.random() * 3000));
+  } catch {}
+  let questions = loadQuestions();
 
-  function setStars(numStars, star) {
-    let stars = numStars;
+  updateNewQuestion(questions[2], "1");
+  updateNewQuestion(questions[1], "2");
+  updateNewQuestion(questions[0], "3");
+}
 
-    for (let i = 1; i < 6; i++, stars--) {
-      let starButton = document.getElementById(star + i);
+function setStars(numStars, star) {
+  let stars = numStars;
 
-      if (stars > 0) {
-        starButton.checked = true;
-        starButton.click;
-      } else {
-        starButton.checked = false;
-        starButton.click;
-      }
-    }
-  }
+  for (let i = 1; i < 6; i++, stars--) {
+    let starButton = document.getElementById(star + i);
 
-  function question() {
-    let question = document.querySelector("#addQuestion");
-
-    if (checkQuestion(question.value)) {
-      addQuestion(question.value);
-      question.value = "";
+    if (stars > 0) {
+      starButton.checked = true;
+      starButton.click;
     } else {
-      question.value = "Question already exists";
+      starButton.checked = false;
+      starButton.click;
+    }
+  }
+}
+
+function question() {
+  let question = document.querySelector("#addQuestion");
+
+  if (checkQuestion(question.value)) {
+    addQuestion(question.value);
+    question.value = "";
+  } else {
+    question.value = "Question already exists";
+  }
+}
+
+function checkQuestion(question) {
+  let questions = loadQuestions();
+
+  let found = false;
+  for (let i = 0; i < questions.length; i++) {
+    if (questions[i].question == question) {
+      found = true;
     }
   }
 
-  function checkQuestion(question) {
-    let questions = loadQuestions();
+  return found;
+}
 
-    let found = false;
-    for (let i = 0; i < questions.length; i++) {
-      if (questions[i].question == question) {
-        found = true;
-      }
+function addQuestion(question) {
+  let userName = getName();
+  let time = Date.now();
+  let stars = 0;
+  let ratings = 0;
+
+  let questions = loadQuestions();
+
+  if (checkQuestion(question)) {
+    questions.push({
+      question: question,
+      userName: userName,
+      stars: stars,
+      numRatings: ratings,
+      date: time,
+    });
+
+    if (questions.length > 2) {
+      questions.sort((a, b) => b.date - a.date);
     }
-
-    return found;
+  } else {
+    throw question;
   }
 
-  function addQuestion(question) {
-    let userName = getName();
-    let time = Date.now();
-    let stars = 0;
-    let ratings = 0;
+  updateQuestions(questions);
+}
 
-    let questions = loadQuestions();
+function topQuestions() {
+  questions = loadQuestions();
 
-    if (checkQuestion(question)) {
-      questions.push({
-        question: question,
-        userName: userName,
-        stars: stars,
-        numRatings: ratings,
-        date: time,
-      });
+  try {
+    questions.sort((a, b) => b.stars - a.stars);
+  } catch {
+    addQuestion(`What number would you like to be on a sports team and why?`);
+    addQuestion(
+      `Since events seem to always happen in threes, what is the next thing to happen to you?`
+    );
+    addQuestion(`What type of books do you take on vacation?`);
+    addQuestion(`What event do you wish you had season tickets to?`);
+    addQuestion(`What's your gift?`);
 
-      if (questions.length > 2) {
-        questions.sort((a, b) => b.date - a.date);
-      }
-    } else {
-      throw question;
-    }
-
-    updateQuestions(questions);
-  }
-
-  function topQuestions() {
     questions = loadQuestions();
-
-    try {
-      questions.sort((a, b) => b.stars - a.stars);
-    } catch {
-      addQuestion(`What number would you like to be on a sports team and why?`);
-      addQuestion(
-        `Since events seem to always happen in threes, what is the next thing to happen to you?`
-      );
-      addQuestion(`What type of books do you take on vacation?`);
-      addQuestion(`What event do you wish you had season tickets to?`);
-      addQuestion(`What's your gift?`);
-
-      questions = loadQuestions();
-      questions.sort((a, b) => b.stars - a.stars);
-    }
-
-    for (let i = 0; i < 5; i++) {
-      updateTopQuestion(questions[i], "q" + (i + 1));
-    }
+    questions.sort((a, b) => b.stars - a.stars);
   }
 
-  function updateTopQuestion(question, id) {
-    setStars(question.stars, id);
-    let questionText = document.getElementById(id);
-    questionText.innerHTML = id[1] + ". " + question.question;
+  for (let i = 0; i < 5; i++) {
+    updateTopQuestion(questions[i], "q" + (i + 1));
+  }
+}
+
+function updateTopQuestion(question, id) {
+  setStars(question.stars, id);
+  let questionText = document.getElementById(id);
+  questionText.innerHTML = id[1] + ". " + question.question;
+}
+
+function updateNewQuestion(question, id) {
+  setStars(Math.round(Math.random() * 5), "s" + id);
+  let questionText = document.getElementById("newQuestion" + id);
+  questionText.innerHTML = question.question;
+}
+
+function chatGPT() {
+  let question = document.querySelector("#helpQuestion");
+
+  question.value = "Called ChatGPT";
+  setTimeout(
+    () =>
+      (question.value =
+        "What do I ask someone who like oranges to discover what else they like?"),
+    10000
+  );
+}
+
+async function star(id) {
+  star = document.getElementById(id);
+  question = document.getElementById(id.substring(0, 2));
+  let questions = loadQuestions;
+
+  qElement = questions.find((q) => q.question === question.innerText.substr(3));
+
+  if (star.checked) {
+    qElement.stars =
+      (qElement.stars * qElement.numRatings + 1) / (qElement.numRatings + 1);
+    qElement.numRatings++;
+  } else {
+    qElement.stars =
+      (qElement.stars * qElement.numRatings - 1) / (qElement.numRatings + 1);
+    qElement.numRatings++;
   }
 
-  function updateNewQuestion(question, id) {
-    setStars(Math.round(Math.random() * 5), "s" + id);
-    let questionText = document.getElementById("newQuestion" + id);
-    questionText.innerHTML = question.question;
-  }
-
-  function chatGPT() {
-    let question = document.querySelector("#helpQuestion");
-
-    question.value = "Called ChatGPT";
-    setTimeout(
-      () =>
-        (question.value =
-          "What do I ask someone who like oranges to discover what else they like?"),
-      10000
-    );
-  }
-
-  async function star(id) {
-    star = document.getElementById(id);
-    question = document.getElementById(id.substring(0, 2));
-    let questions = loadQuestions;
-
-    qElement = questions.find(
-      (q) => q.question === question.innerText.substr(3)
-    );
-
-    if (star.checked) {
-      qElement.stars =
-        (qElement.stars * qElement.numRatings + 1) / (qElement.numRatings + 1);
-      qElement.numRatings++;
-    } else {
-      qElement.stars =
-        (qElement.stars * qElement.numRatings - 1) / (qElement.numRatings + 1);
-      qElement.numRatings++;
-    }
-
-    await updateQuestions(questions);
-  }
-} catch {
-  console.log("Error");
+  await updateQuestions(questions);
 }
 
 async function loadQuestions() {
