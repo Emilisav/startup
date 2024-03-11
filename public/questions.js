@@ -1,10 +1,10 @@
 // Populate Questions
 //localStorage.setItem("questions", []);
 
-topQuestions();
-setTitle();
+//topQuestions();
+//setTitle();
 
-setInterval(getNewestQuestions, 3000);
+//setInterval(getNewestQuestions, 3000);
 
 function getName() {
   if (
@@ -136,16 +136,45 @@ function updateNewQuestion(question, id) {
   questionText.innerHTML = question.question;
 }
 
-function chatGPT() {
-  let question = document.querySelector("#helpQuestion");
+async function chatGPT() {
+  const keyResponse = await fetch("/api/key");
+  key = await keyResponse.json();
 
-  question.value = "Called ChatGPT";
-  setTimeout(
-    () =>
-      (question.value =
-        "What do I ask someone who like oranges to discover what else they like?"),
-    10000
-  );
+  await fetch(
+    "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        messages: [
+          {
+            role: "system",
+            content: "What questions do I ask on a date?",
+          },
+        ],
+        max_tokens: 800,
+        temperature: 0.7,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        top_p: 0.95,
+        stop: null,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": key,
+      },
+    }
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      const containerEl = document.querySelector("#gpt");
+
+      const answerEl = document.createElement("p");
+      answerEl.classList.add("answer");
+
+      answerEl.textContent = data.content;
+
+      containerEl.appendChild(answerEl);
+    });
 }
 
 async function star(id) {
