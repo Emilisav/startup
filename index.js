@@ -29,6 +29,7 @@ async function askGPT() {
 
   // Path to the file containing the secret
   const filePath = "key.txt";
+  let response;
 
   // Read the secret from the file
   fs.readFile(filePath, "utf8", async (err, key) => {
@@ -36,11 +37,14 @@ async function askGPT() {
       console.error("Error reading the file:", err);
       return;
     }
-
-    return await fetch(
+    response = fetch(
       "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
       {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": key,
+        },
         body: JSON.stringify({
           messages: [
             {
@@ -55,13 +59,10 @@ async function askGPT() {
           top_p: 0.95,
           stop: null,
         }),
-        headers: {
-          "Content-Type": "application/json",
-          "api-key": key,
-        },
       }
     );
   });
+  return response;
 }
 
 // Submit Questions
