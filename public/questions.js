@@ -1,10 +1,10 @@
 // Populate Questions
-//localStorage.setItem("questions", []);
+localStorage.setItem("questions", []);
 
-//topQuestions();
-//setTitle();
+setTitle();
+topQuestions();
 
-//setInterval(getNewestQuestions, 3000);
+setInterval(getNewestQuestions, 3000);
 
 function getName() {
   if (
@@ -22,12 +22,14 @@ function setTitle() {
   title.innerText = "Welcome to TalkShow " + getName() + "!";
 }
 
-function getNewestQuestions() {
+async function getNewestQuestions() {
   // Populate Questions
   try {
     addQuestion(`new question ` + Math.floor(Math.random() * 3000));
   } catch {}
-  let questions = loadQuestions();
+  let questions = await loadQuestions();
+
+  questions.sort((a, b) => b.date - a.date);
 
   updateNewQuestion(questions[2], "1");
   updateNewQuestion(questions[1], "2");
@@ -50,10 +52,10 @@ function setStars(numStars, star) {
   }
 }
 
-function question() {
+async function question() {
   let question = document.querySelector("#addQuestion");
 
-  if (checkQuestion(question.value)) {
+  if (await checkQuestion(question.value)) {
     addQuestion(question.value);
     question.value = "";
   } else {
@@ -61,63 +63,38 @@ function question() {
   }
 }
 
-function checkQuestion(question) {
-  let questions = loadQuestions();
+async function checkQuestion(question) {
+  let questions = await loadQuestions();
 
-  let found = false;
+  let isNew = true;
   for (let i = 0; i < questions.length; i++) {
     if (questions[i].question == question) {
-      found = true;
+      isNew = false;
     }
   }
 
-  return found;
+  return isNew;
 }
 
-function addQuestion(question) {
+async function addQuestion(question) {
   let userName = getName();
   let time = Date.now();
   let stars = 0;
   let ratings = 0;
 
-  let questions = loadQuestions();
-
-  if (checkQuestion(question)) {
-    questions.push({
-      question: question,
-      userName: userName,
-      stars: stars,
-      numRatings: ratings,
-      date: time,
-    });
-
-    if (questions.length > 2) {
-      questions.sort((a, b) => b.date - a.date);
-    }
-  } else {
-    throw question;
-  }
-
-  updateQuestions(questions);
+  updateQuestions({
+    question: question,
+    userName: userName,
+    stars: stars,
+    numRatings: ratings,
+    date: time,
+  });
 }
 
-function topQuestions() {
-  questions = loadQuestions();
+async function topQuestions() {
+  questions = await loadQuestions();
 
-  try {
-    questions.sort((a, b) => b.stars - a.stars);
-  } catch {
-    addQuestion(`What number would you like to be on a sports team and why?`);
-    addQuestion(
-      `Since events seem to always happen in threes, what is the next thing to happen to you?`
-    );
-    addQuestion(`What type of books do you take on vacation?`);
-    addQuestion(`What event do you wish you had season tickets to?`);
-    addQuestion(`What's your gift?`);
-
-    questions = loadQuestions();
-    questions.sort((a, b) => b.stars - a.stars);
-  }
+  questions.sort((a, b) => b.stars - a.stars);
 
   for (let i = 0; i < 5; i++) {
     updateTopQuestion(questions[i], "q" + (i + 1));
@@ -137,33 +114,7 @@ function updateNewQuestion(question, id) {
 }
 
 async function chatGPT() {
-  const keyResponse = await fetch("/api/key");
-  key = await keyResponse.json();
-
-  await fetch(
-    "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        messages: [
-          {
-            role: "system",
-            content: "What questions do I ask on a date?",
-          },
-        ],
-        max_tokens: 800,
-        temperature: 0.7,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-        top_p: 0.95,
-        stop: null,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": key,
-      },
-    }
-  )
+  const keyResponse = await fetch("/api/gpt")
     .then((response) => response.json())
     .then((data) => {
       const containerEl = document.querySelector("#gpt");
@@ -180,7 +131,7 @@ async function chatGPT() {
 async function star(id) {
   star = document.getElementById(id);
   question = document.getElementById(id.substring(0, 2));
-  let questions = loadQuestions;
+  let questions = await loadQuestions();
 
   qElement = questions.find((q) => q.question === question.innerText.substr(3));
 
@@ -194,42 +145,51 @@ async function star(id) {
     qElement.numRatings++;
   }
 
-  await updateQuestions(questions);
+  updateStars(qElement);
+}
+
+async function updateStars(question) {
+  try {
+    const response = await fetch("/api/star", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(question),
+    });
+    const questions = await response.json();
+    localStorage.setItem("questions", JSON.stringify(questions));
+  } catch {}
 }
 
 async function loadQuestions() {
-  let questions = [];
   try {
     // Get the latest questions from the service
-    const response = await fetch("/api/questions");
-    questions = await response.json();
+    const qResponse = await fetch("/api/questions");
+    let questions = await qResponse.json();
 
     // Save the questions in case we go offline in the future
     localStorage.setItem("questions", JSON.stringify(questions));
+    return questions;
   } catch {
     // If there was an error then just use the last saved questions
     const questionsText = localStorage.getItem("questions");
     if (questionsText) {
-      questions = JSON.parse(questionsText);
+      return JSON.parse(questionsText);
     } else {
-      questions = [];
+      return [];
     }
   }
-
-  return questions;
 }
 
-async function updateQuestions(newQuestions) {
+async function updateQuestions(newQuestion) {
   try {
     const response = await fetch("/api/questions", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify(newQuestions),
+      body: JSON.stringify(newQuestion),
     });
 
     // Store what the service gave us as the high scores
     const questions = await response.json();
+    localStorage.setItem("questions", JSON.stringify(questions));
   } catch {}
-
-  localStorage.setItem("questions", JSON.stringify(questions));
 }
