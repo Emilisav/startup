@@ -76,3 +76,15 @@ For this deliverable I built out the structure of my application using HTML.
 - [x] done 20% JavaScript support for future database data on login.js and questions.js
 - [x] done 20% JavaScript support for future WebSocket on latest quesions
 - [x] done 40% JavaScript support for your application's interaction logic on questions.js
+
+# Server delivarables
+- [x] done Prerequisite: Simon Service deployed to your production environment
+- [x] done Prerequisite: A link to your GitHub startup repository prominently displayed on your application's home page
+- [x] done Prerequisite: These notes documenting what I modified and added with this deliverable
+- [x] done Prerequisite: At least 10 git commits spread consistently throughout the assignment period.
+- [x] done Backend web service support and interaction
+- [x] done 40% - Create an HTTP service using Node.js and Express
+- [x] done 10% - Frontend served up using Express static middleware in public directory
+- [] done 10% - Your frontend calls third party service endpoints like chat gpt but not done
+- [x] done 20% - Your backend provides service endpoints like /questions
+- [x] done 20% - Your frontend calls your service endpoints in load questions
