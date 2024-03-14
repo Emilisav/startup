@@ -25,44 +25,36 @@ apiRouter.get("/gpt", async (_req, res) => {
 });
 
 async function askGPT() {
-  const fs = require("fs");
+  let key = require("./key.json").key;
 
-  // Path to the file containing the secret
-  const filePath = "key.txt";
-  let response;
-
-  // Read the secret from the file
-  fs.readFile(filePath, "utf8", async (err, key) => {
-    if (err) {
-      console.error("Error reading the file:", err);
-      return;
+  response = await fetch(
+    "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": key,
+      },
+      body: {
+        messages: [
+          {
+            role: "system",
+            content: "What do I ask about oranges?",
+          },
+        ],
+        temperature: 0.7,
+        top_p: 0.95,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        max_tokens: 800,
+        stop: null,
+      },
     }
-    response = fetch(
-      "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "api-key": key,
-        },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: "system",
-              content: "What questions do I ask on a date?",
-            },
-          ],
-          max_tokens: 800,
-          temperature: 0.7,
-          frequency_penalty: 0,
-          presence_penalty: 0,
-          top_p: 0.95,
-          stop: null,
-        }),
-      }
-    );
-  });
-  return response;
+  );
+
+  console.log(response);
+
+  return response.message;
 }
 
 // Submit Questions
@@ -148,4 +140,10 @@ function updateStar(newQuestion, questions) {
   questions.find((q) => q.question === newQuestion.question).stars =
     newQuestion.stars;
   return questions;
+}
+
+setInterval(getNewestQuestions, 10000);
+
+function getNewestQuestions() {
+  updateQuestion(`new question ` + Math.floor(Math.random() * 3000), questions);
 }

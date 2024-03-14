@@ -5,7 +5,7 @@ setTitle();
 topQuestions();
 setBackground();
 
-setInterval(getNewestQuestions, 3000);
+setInterval(getNewestQuestions, 10000);
 
 function getName() {
   if (
@@ -25,9 +25,7 @@ function setTitle() {
 
 async function getNewestQuestions() {
   // Populate Questions
-  try {
-    addQuestion(`new question ` + Math.floor(Math.random() * 3000));
-  } catch {}
+
   let questions = await loadQuestions();
 
   questions.sort((a, b) => b.date - a.date);
@@ -115,18 +113,16 @@ function updateNewQuestion(question, id) {
 }
 
 async function chatGPT() {
-  const keyResponse = await fetch("/api/gpt")
-    .then((response) => response.json())
-    .then((data) => {
-      const containerEl = document.querySelector("#gpt");
+  const keyResponse = await fetch("/api/gpt").then((data) => {
+    const containerEl = document.querySelector("#gpt");
 
-      const answerEl = document.createElement("p");
-      answerEl.classList.add("answer");
+    const answerEl = document.createElement("p");
+    answerEl.classList.add("answer");
 
-      answerEl.textContent = data.content;
+    answerEl.textContent = data.content;
 
-      containerEl.appendChild(answerEl);
-    });
+    containerEl.appendChild(answerEl);
+  });
 }
 
 async function star(id) {
@@ -200,6 +196,13 @@ async function setBackground() {
   fetch(`https://picsum.photos/v2/list?page=${random}&limit=1`)
     .then((response) => response.json())
     .then((data) => {
+      const containerEl = document.querySelector("#background");
+      const width = containerEl.offsetWidth;
+      const height = containerEl.offsetHeight;
+      const imgUrl = `https://picsum.photos/id/${data[0].id}/${width}/${height}`;
+      containerEl.setAttribute("style", `background-image: url(${imgUrl})`);
+
+      /* 
       const containerEl = document.querySelector("#accordionExample");
 
       const width = containerEl.offsetWidth;
@@ -209,5 +212,6 @@ async function setBackground() {
       const imgEl = document.createElement("img");
       imgEl.setAttribute("src", imgUrl);
       containerEl.appendChild(imgEl);
+      */
     });
 }

@@ -3,4 +3,4 @@
 node_modules/
 dist/
 dbConfig.json
-key.txt
+key.json
