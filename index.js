@@ -120,10 +120,10 @@ let questions = [
     date: 0,
   },
 ];
-function updateQuestion(newQuestion, questions) {
+function updateQuestion(newQuestion) {
   let found = false;
   for (const [i, prevScore] of questions.entries()) {
-    if (newQuestion.question == prevScore.question) {
+    if (newQuestion.question == prevScore) {
       found = true;
       break;
     }
@@ -145,5 +145,16 @@ function updateStar(newQuestion, questions) {
 setInterval(getNewestQuestions, 10000);
 
 function getNewestQuestions() {
-  updateQuestion(`new question ` + Math.floor(Math.random() * 3000), questions);
+  let userName = "websocket";
+  let time = Date.now();
+  let stars = 0;
+  let ratings = 0;
+
+  updateQuestion({
+    question: `new question ` + Math.floor(Math.random() * 3000),
+    userName: userName,
+    stars: stars,
+    numRatings: ratings,
+    date: time,
+  });
 }
