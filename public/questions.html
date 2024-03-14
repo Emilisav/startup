@@ -790,10 +790,8 @@
                     Add Question
                   </button>
 
-                  <div class="mb-3">
-                    <label class="form-label" id="gpt"
-                      >Get help from chatGPT</label
-                    >
+                  <div class="mb-3" id="gpt">
+                    <label class="form-label">Get help from chatGPT</label>
                     <input
                       onfocus="this.value=''"
                       type="text"
@@ -802,6 +800,7 @@
                       id="helpQuestion"
                       placeholder="What do I ask someone who like oranges to discover what else they like?"
                     />
+                    
                   </div>
 
                   <button type="submit" onclick="chatGPT()">

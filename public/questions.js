@@ -113,13 +113,18 @@ function updateNewQuestion(question, id) {
 }
 
 async function chatGPT() {
-  const keyResponse = await fetch("/api/gpt").then((data) => {
+  const keyResponse = await fetch(
+    "/api/gpt" /*, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(document.querySelector("#helpQuestion").value),
+  }*/
+  ).then((data) => {
     const containerEl = document.querySelector("#gpt");
 
     const answerEl = document.createElement("p");
-    answerEl.classList.add("answer");
 
-    answerEl.textContent = data.content;
+    answerEl.textContent = data;
 
     containerEl.appendChild(answerEl);
   });

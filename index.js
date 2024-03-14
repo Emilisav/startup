@@ -21,10 +21,11 @@ apiRouter.get("/questions", (_req, res) => {
 
 // ask chatGPT something
 apiRouter.get("/gpt", async (_req, res) => {
-  res.send(await askGPT());
+  let answer = await askGPT(_req.body);
+  res.send(answer);
 });
 
-async function askGPT() {
+async function askGPT(question) {
   let key = require("./key.json").key;
 
   response = await fetch(
@@ -35,26 +36,32 @@ async function askGPT() {
         "Content-Type": "application/json",
         "api-key": key,
       },
-      body: {
+      // body: '{\n  "messages": [{"role":"system","content":"You are an AI assistant that helps people find information."}],\n  "max_tokens": 800,\n  "temperature": 0.7,\n  "frequency_penalty": 0,\n  "presence_penalty": 0,\n  "top_p": 0.95,\n  "stop": null\n}',
+      body: JSON.stringify({
         messages: [
           {
             role: "system",
-            content: "What do I ask about oranges?",
+            /*Assistant: The role that provides responses to system-instructed or user-prompted input.
+Function: The role that provides function results for chat completions.
+System: The role that instructs or sets the behavior of the assistant.
+Tool: The role that represents extension tool activity within a chat completions operation.
+User: The role that provides input for chat completions1. */
+            content: "question",
           },
         ],
+        max_tokens: 800,
         temperature: 0.7,
-        top_p: 0.95,
         frequency_penalty: 0,
         presence_penalty: 0,
-        max_tokens: 800,
+        top_p: 0.95,
         stop: null,
-      },
+      }),
     }
   );
 
-  console.log(response);
+  response2 = (await response.json()).choices;
 
-  return response.message;
+  return response2[0].message.content;
 }
 
 // Submit Questions
