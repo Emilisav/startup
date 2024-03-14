@@ -85,6 +85,6 @@ For this deliverable I built out the structure of my application using HTML.
 - [x] done Backend web service support and interaction
 - [x] done 40% - Create an HTTP service using Node.js and Express
 - [x] done 10% - Frontend served up using Express static middleware in public directory
-- [x] done 10% - Your frontend calls third party service endpoints picture on questions page until I get chatGPT working
-- [x] done 20% - Your backend provides service endpoints like /questions
-- [x] done 20% - Your frontend calls your service endpoints in load questions
+- [x] done 10% - Your frontend calls third party service endpoints: picture on questions page, also chatGPT but that's on the backend
+- [x] done 20% - Your backend provides service endpoints like /questions that gets all the questions
+- [x] done 20% - Your frontend calls your service endpoints in loadQuestions() which gets a list of questions
