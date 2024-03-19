@@ -20,8 +20,8 @@ apiRouter.get("/questions", (_req, res) => {
 });
 
 // ask chatGPT something
-apiRouter.get("/gpt", async (_req, res) => {
-  let answer = await askGPT(_req.body);
+apiRouter.post("/gpt", async (_req, res) => {
+  let answer = await askGPT(_req.body.question);
   res.send(answer);
 });
 
@@ -46,7 +46,7 @@ Function: The role that provides function results for chat completions.
 System: The role that instructs or sets the behavior of the assistant.
 Tool: The role that represents extension tool activity within a chat completions operation.
 User: The role that provides input for chat completions1. */
-            content: "question",
+            content: question,
           },
         ],
         max_tokens: 800,
@@ -61,7 +61,7 @@ User: The role that provides input for chat completions1. */
 
   response2 = (await response.json()).choices;
 
-  return response2[0].message.content;
+  return response2[0].message;
 }
 
 // Submit Questions

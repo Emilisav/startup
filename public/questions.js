@@ -113,21 +113,23 @@ function updateNewQuestion(question, id) {
 }
 
 async function chatGPT() {
-  const keyResponse = await fetch(
-    "/api/gpt" /*, {
+  let asked = document.querySelector("#helpQuestion").value;
+
+  const keyResponse = await fetch("/api/gpt", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(document.querySelector("#helpQuestion").value),
-  }*/
-  ).then((data) => {
-    const containerEl = document.querySelector("#gpt");
+    body: JSON.stringify({ question: asked }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      const containerEl = document.querySelector("#gpt");
 
-    const answerEl = document.createElement("p");
+      const answerEl = document.createElement("p");
 
-    answerEl.textContent = data;
+      answerEl.textContent = data.content;
 
-    containerEl.appendChild(answerEl);
-  });
+      containerEl.appendChild(answerEl);
+    });
 }
 
 async function star(id) {
