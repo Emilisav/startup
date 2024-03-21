@@ -1,5 +1,10 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
 const app = express();
+const db = require("./db.js");
+
+const authCookieName = "token";
 
 // The service port. In production the frontend code is statically hosted by the service on the same port.
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
@@ -7,15 +12,71 @@ const port = process.argv.length > 2 ? process.argv[2] : 3000;
 // JSON body parsing using built-in middleware
 app.use(express.json());
 
+// Use the cookie parser middleware for tracking authentication tokens
+app.use(cookieParser());
+
 // Serve up the frontend static content hosting
 app.use(express.static("public"));
+
+// Trust headers that are forwarded from the proxy so we can determine IP addresses
+app.set("trust proxy", true);
 
 // Router for service endpoints
 const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
+// CreateAuth token for a new user
+apiRouter.post("/auth/create", async (req, res) => {
+  if (await db.getUser(req.body.email)) {
+    res.status(409).send({ msg: "Existing user" });
+  } else {
+    const user = await db.createUser(req.body.email, req.body.password);
+
+    // Set the cookie
+    setAuthCookie(res, user.token);
+
+    res.send({
+      id: user._id,
+    });
+  }
+});
+
+// GetAuth token for the provided credentials
+apiRouter.post("/auth/login", async (req, res) => {
+  const user = await db.getUser(req.body.email);
+  if (user) {
+    if (await bcrypt.compare(req.body.password, user.password)) {
+      setAuthCookie(res, user.token);
+      res.send({ id: user._id });
+      return;
+    }
+  }
+  res.status(401).send({ msg: "Unauthorized" });
+});
+
+// DeleteAuth token if stored in cookie
+apiRouter.delete("/auth/logout", (_req, res) => {
+  res.clearCookie(authCookieName);
+  res.status(204).end();
+});
+
+// secureApiRouter verifies credentials for endpoints
+var secureApiRouter = express.Router();
+apiRouter.use(secureApiRouter);
+
+secureApiRouter.use(async (req, res, next) => {
+  authToken = req.cookies[authCookieName];
+  const user = await db.getUserByToken(authToken);
+  if (user) {
+    next();
+  } else {
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+});
+
 // Get Questions
-apiRouter.get("/questions", (_req, res) => {
+secureApiRouter.get("/questions", async (_req, res) => {
+  const questions = await db.getQuestions();
   res.send(questions);
 });
 
@@ -127,8 +188,10 @@ let questions = [
     date: 0,
   },
 ];
-function updateQuestion(newQuestion) {
+async function updateQuestion(newQuestion) {
   let found = false;
+  const questions = await db.getQuestions();
+
   for (const [i, prevScore] of questions.entries()) {
     if (newQuestion.question == prevScore) {
       found = true;
@@ -137,7 +200,7 @@ function updateQuestion(newQuestion) {
   }
 
   if (!found) {
-    questions.push(newQuestion);
+    await db.addQuestion(newQuestion);
   }
 
   return questions;
@@ -163,5 +226,19 @@ function getNewestQuestions() {
     stars: stars,
     numRatings: ratings,
     date: time,
+  });
+}
+
+// Default error handler
+app.use(function (err, req, res, next) {
+  res.status(500).send({ type: err.name, message: err.message });
+});
+
+// setAuthCookie in the HTTP response
+function setAuthCookie(res, authToken) {
+  res.cookie(authCookieName, authToken, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "strict",
   });
 }

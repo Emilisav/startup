@@ -1,22 +1,29 @@
-function login() {
-  guest();
+async function login() {
+  let name = document.querySelector("#name")?.value;
+  let psw = document.querySelector("#psw")?.value;
 
-  let name = document.querySelector("#name");
-  let psw = document.querySelector("#psw");
+  const response = await fetch(endpoint, {
+    method: "post",
+    body: JSON.stringify({ name: name, password: psw }),
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+  });
 
-  if (check(name, psw)) {
-    localStorage.setItem("userName", name.value);
-    localStorage.setItem("password", psw.value);
+  if (response.ok) {
+    localStorage.setItem("userName", name);
   } else {
-    throw "Wrong Password";
+    const body = await response.json();
+    const modalEl = document.querySelector("#msgModal");
+    modalEl.querySelector(".modal-body").textContent = `⚠ Error: ${body.msg}`;
+    const msgModal = new bootstrap.Modal(modalEl, {});
+    msgModal.show();
   }
-}
-
-function check(name, psw) {
-  return true;
 }
 
 function guest() {
   localStorage.removeItem("userName");
-  localStorage.removeItem("password");
+  fetch(`/api/auth/logout`, {
+    method: "delete",
+  });
 }
