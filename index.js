@@ -27,7 +27,9 @@ app.use(`/api`, apiRouter);
 
 // CreateAuth token for a new user
 apiRouter.post("/auth/login", async (req, res) => {
-  if (await db.getUser(req.body.name)) {
+  const user = await db.getUser(req.body.email);
+
+  if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
       setAuthCookie(res, user.token);
       res.send({ id: user._id });

@@ -27,12 +27,13 @@ async function getNewestQuestions() {
   // Populate Questions
 
   let questions = await loadQuestions();
+  if (questions.length > 3) {
+    questions.sort((a, b) => b.date - a.date);
 
-  questions.sort((a, b) => b.date - a.date);
-
-  updateNewQuestion(questions[2], "1");
-  updateNewQuestion(questions[1], "2");
-  updateNewQuestion(questions[0], "3");
+    updateNewQuestion(questions[2], "1");
+    updateNewQuestion(questions[1], "2");
+    updateNewQuestion(questions[0], "3");
+  }
 }
 
 function setStars(numStars, star) {
@@ -92,11 +93,12 @@ async function addQuestion(question) {
 
 async function topQuestions() {
   questions = await loadQuestions();
+  if (questions.length > 5) {
+    questions.sort((a, b) => b.stars - a.stars);
 
-  questions.sort((a, b) => b.stars - a.stars);
-
-  for (let i = 0; i < 5; i++) {
-    updateTopQuestion(questions[i], "q" + (i + 1));
+    for (let i = 0; i < 5; i++) {
+      updateTopQuestion(questions[i], "q" + (i + 1));
+    }
   }
 }
 
@@ -115,21 +117,27 @@ function updateNewQuestion(question, id) {
 async function chatGPT() {
   let asked = document.querySelector("#helpQuestion").value;
 
-  const keyResponse = await fetch("/api/gpt", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ question: asked }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      const containerEl = document.querySelector("#gpt");
+  try {
+    const keyResponse = await fetch("/api/gpt", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ question: asked }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.msg) {
+          window.location.href = "index.html";
+          throw msg;
+        }
+        const containerEl = document.querySelector("#gpt");
 
-      const answerEl = document.createElement("p");
+        const answerEl = document.createElement("p");
 
-      answerEl.textContent = data.content;
+        answerEl.textContent = data.content;
 
-      containerEl.appendChild(answerEl);
-    });
+        containerEl.appendChild(answerEl);
+      });
+  } catch {}
 }
 
 async function star(id) {
@@ -159,6 +167,10 @@ async function updateStars(question) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(question),
     });
+    if (questions.msg) {
+      window.location.href = "index.html";
+      throw msg;
+    }
     const questions = await response.json();
     localStorage.setItem("questions", JSON.stringify(questions));
   } catch {}
@@ -169,7 +181,10 @@ async function loadQuestions() {
     // Get the latest questions from the service
     const qResponse = await fetch("/api/questions");
     let questions = await qResponse.json();
-
+    if (questions.msg) {
+      window.location.href = "index.html";
+      throw msg;
+    }
     // Save the questions in case we go offline in the future
     localStorage.setItem("questions", JSON.stringify(questions));
     return questions;
@@ -192,8 +207,11 @@ async function updateQuestions(newQuestion) {
       body: JSON.stringify(newQuestion),
     });
 
-    // Store what the service gave us as the high scores
     const questions = await response.json();
+    if (questions.msg) {
+      window.location.href = "index.html";
+      throw msg;
+    }
     localStorage.setItem("questions", JSON.stringify(questions));
   } catch {}
 }
@@ -208,17 +226,5 @@ async function setBackground() {
       const height = containerEl.offsetHeight;
       const imgUrl = `https://picsum.photos/id/${data[0].id}/${width}/${height}`;
       containerEl.setAttribute("style", `background-image: url(${imgUrl})`);
-
-      /* 
-      const containerEl = document.querySelector("#accordionExample");
-
-      const width = containerEl.offsetWidth;
-      const height = containerEl.offsetHeight;
-
-      const imgUrl = `https://picsum.photos/id/${data[0].id}/${width}/${height}`;
-      const imgEl = document.createElement("img");
-      imgEl.setAttribute("src", imgUrl);
-      containerEl.appendChild(imgEl);
-      */
     });
 }

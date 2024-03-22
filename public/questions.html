@@ -43,7 +43,11 @@
         </div>
       </nav>
       <form method="get" id="back" action="index.html">
-        <button class="btn btn-sm btn-outline-secondary" type="submit">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          onclick="goBack()"
+          type="submit"
+        >
           Back to Login
         </button>
       </form>
@@ -800,7 +804,6 @@
                       id="helpQuestion"
                       placeholder="What do I ask someone who like oranges to discover what else they like?"
                     />
-                    
                   </div>
 
                   <button type="submit" onclick="chatGPT()">
@@ -1247,6 +1250,7 @@
         </div>
       </div>
       <script src="questions.js"></script>
+      <script src="login.js"></script>
     </main>
 
     <footer>
