@@ -21,16 +21,20 @@ const questionCollection = db.collection("question");
   process.exit(1);
 });
 
+function getUser(name) {
+  return userCollection.findOne({ name: name });
+}
+
 function getUserByToken(token) {
   return userCollection.findOne({ token: token });
 }
 
-async function createUser(email, password) {
+async function createUser(name, password) {
   // Hash the password before we insert it into the database
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = {
-    email: email,
+    name: name,
     password: passwordHash,
     token: uuid.v4(),
   };
@@ -44,16 +48,12 @@ function addQuestion(score) {
 }
 
 function getQuestions() {
-  const query = { question: { $gt: 0, $lt: 900 } };
-  const options = {
-    sort: { question: -1 },
-    limit: 10,
-  };
-  const cursor = questionCollection.find(query, options);
+  const cursor = questionCollection.find();
   return cursor.toArray();
 }
 
 module.exports = {
+  getUser,
   getUserByToken,
   createUser,
   addQuestion,

@@ -5,7 +5,7 @@ setTitle();
 topQuestions();
 setBackground();
 
-setInterval(getNewestQuestions, 10000);
+setInterval(getNewestQuestions, 1000);
 
 function getName() {
   if (

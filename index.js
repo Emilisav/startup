@@ -1,6 +1,6 @@
-const express = require("express");
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt");
+const express = require("express");
 const app = express();
 const db = require("./db.js");
 
@@ -26,11 +26,17 @@ const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
 // CreateAuth token for a new user
-apiRouter.post("/auth/create", async (req, res) => {
-  if (await db.getUser(req.body.email)) {
-    res.status(409).send({ msg: "Existing user" });
+apiRouter.post("/auth/login", async (req, res) => {
+  if (await db.getUser(req.body.name)) {
+    if (await bcrypt.compare(req.body.password, user.password)) {
+      setAuthCookie(res, user.token);
+      res.send({ id: user._id });
+      return;
+    }
+
+    res.status(401).send({ msg: "Unauthorized" });
   } else {
-    const user = await db.createUser(req.body.email, req.body.password);
+    const user = await db.createUser(req.body.name, req.body.password);
 
     // Set the cookie
     setAuthCookie(res, user.token);
@@ -39,19 +45,6 @@ apiRouter.post("/auth/create", async (req, res) => {
       id: user._id,
     });
   }
-});
-
-// GetAuth token for the provided credentials
-apiRouter.post("/auth/login", async (req, res) => {
-  const user = await db.getUser(req.body.email);
-  if (user) {
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      setAuthCookie(res, user.token);
-      res.send({ id: user._id });
-      return;
-    }
-  }
-  res.status(401).send({ msg: "Unauthorized" });
 });
 
 // DeleteAuth token if stored in cookie
@@ -81,7 +74,7 @@ secureApiRouter.get("/questions", async (_req, res) => {
 });
 
 // ask chatGPT something
-apiRouter.post("/gpt", async (_req, res) => {
+secureApiRouter.post("/gpt", async (_req, res) => {
   let answer = await askGPT(_req.body.question);
   res.send(answer);
 });
@@ -126,14 +119,14 @@ User: The role that provides input for chat completions1. */
 }
 
 // Submit Questions
-apiRouter.post("/questions", (req, res) => {
+secureApiRouter.post("/questions", (req, res) => {
   questions = updateQuestion(req.body, questions);
 
   res.send(questions);
 });
 
 // Update stars
-apiRouter.post("/star", (req, res) => {
+secureApiRouter.post("/star", (req, res) => {
   questions = updateStar(req.body, questions);
 
   res.send(questions);
@@ -150,44 +143,7 @@ app.listen(port, () => {
 
 // updateScores considers a new score for inclusion in the high scores.
 // The high scores are saved in memory and disappear whenever the service is restarted.
-let questions = [
-  {
-    question: "What number would you like to be on a sports team and why?",
-    userName: "ned",
-    stars: 0,
-    numRatings: 0,
-    date: 0,
-  },
-  {
-    question:
-      "Since events seem to always happen in threes, what is the next thing to happen to you?",
-    userName: "ned",
-    stars: 0,
-    numRatings: 0,
-    date: 0,
-  },
-  {
-    question: "What type of books do you take on vacation?",
-    userName: "ned",
-    stars: 0,
-    numRatings: 0,
-    date: 0,
-  },
-  {
-    question: "What event do you wish you had season tickets to?",
-    userName: "ned",
-    stars: 0,
-    numRatings: 0,
-    date: 0,
-  },
-  {
-    question: "What's your gift?",
-    userName: "ned",
-    stars: 0,
-    numRatings: 0,
-    date: 0,
-  },
-];
+let questions = [];
 async function updateQuestion(newQuestion) {
   let found = false;
   const questions = await db.getQuestions();
@@ -200,11 +156,49 @@ async function updateQuestion(newQuestion) {
   }
 
   if (!found) {
-    await db.addQuestion(newQuestion);
+    db.addQuestion(newQuestion);
   }
 
   return questions;
 }
+
+// Populate Questions
+updateQuestion({
+  question: "What number would you like to be on a sports team and why?",
+  userName: "ned",
+  stars: 0,
+  numRatings: 0,
+  date: 0,
+});
+updateQuestion({
+  question:
+    "Since events seem to always happen in threes, what is the next thing to happen to you?",
+  userName: "ned",
+  stars: 0,
+  numRatings: 0,
+  date: 0,
+});
+updateQuestion({
+  question: "What type of books do you take on vacation?",
+  userName: "ned",
+  stars: 0,
+  numRatings: 0,
+  date: 0,
+});
+updateQuestion({
+  question: "What event do you wish you had season tickets to?",
+  userName: "ned",
+  stars: 0,
+  numRatings: 0,
+  date: 0,
+});
+updateQuestion({
+  question: "What's your gift?",
+  userName: "ned",
+  stars: 0,
+  numRatings: 0,
+  date: 0,
+});
 
 function updateStar(newQuestion, questions) {
   questions.find((q) => q.question === newQuestion.question).stars =

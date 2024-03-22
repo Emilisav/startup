@@ -2,7 +2,7 @@ async function login() {
   let name = document.querySelector("#name")?.value;
   let psw = document.querySelector("#psw")?.value;
 
-  const response = await fetch(endpoint, {
+  const response = await fetch(`/api/auth/login`, {
     method: "post",
     body: JSON.stringify({ name: name, password: psw }),
     headers: {
