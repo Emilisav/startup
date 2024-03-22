@@ -4,7 +4,7 @@ setTitle();
 topQuestions();
 setBackground();
 
-//setInterval(getNewestQuestions, 1000);
+setInterval(getNewestQuestions, 1000);
 
 function getName() {
   if (
@@ -29,9 +29,9 @@ async function getNewestQuestions() {
   if (questions.length > 3) {
     questions.sort((a, b) => b.date - a.date);
 
-    updateNewQuestion(questions[2], "1");
-    updateNewQuestion(questions[1], "2");
-    updateNewQuestion(questions[0], "3");
+    updateNewQuestion(questions[2], "s1");
+    updateNewQuestion(questions[1], "s2");
+    updateNewQuestion(questions[0], "s3");
   }
 }
 
@@ -108,8 +108,8 @@ function updateTopQuestion(question, id) {
 }
 
 function updateNewQuestion(question, id) {
-  setStars(Math.round(Math.random() * 5), "s" + id);
-  let questionText = document.getElementById("newQuestion" + id);
+  setStars(question.stars, id);
+  let questionText = document.getElementById(id);
   questionText.innerHTML = question.question;
 }
 
@@ -143,14 +143,19 @@ async function chatGPT() {
 
 async function star(id) {
   let starEl = document.getElementById(id);
-  questionEl = document.getElementById(id.substring(0, 2));
+  let questionEl = document.getElementById(id.substring(0, 2));
 
+  if (id.substring(0, 1) == "s") {
+    q = questionEl.innerText;
+  } else {
+    q = questionEl.innerText.substring(3);
+  }
   if (starEl.checked) {
     try {
       const response = await fetch("/api/star", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: questionEl.innerText.substr(3) }),
+        body: JSON.stringify({ question: q }),
       });
       if (response.msg) {
         window.location.href = "index.html";
@@ -166,7 +171,7 @@ async function star(id) {
       const response = await fetch("/api/star", {
         method: "DELETE",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: question.innerText.substr(3) }),
+        body: JSON.stringify({ question: q }),
       });
       if (response.msg) {
         window.location.href = "index.html";
