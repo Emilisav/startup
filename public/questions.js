@@ -1,11 +1,10 @@
-// Populate Questions
 localStorage.setItem("questions", []);
 
 setTitle();
 topQuestions();
 setBackground();
 
-setInterval(getNewestQuestions, 1000);
+//setInterval(getNewestQuestions, 1000);
 
 function getName() {
   if (
@@ -137,43 +136,50 @@ async function chatGPT() {
 
         containerEl.appendChild(answerEl);
       });
-  } catch {}
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function star(id) {
-  star = document.getElementById(id);
-  question = document.getElementById(id.substring(0, 2));
-  let questions = await loadQuestions();
+  let starEl = document.getElementById(id);
+  questionEl = document.getElementById(id.substring(0, 2));
 
-  qElement = questions.find((q) => q.question === question.innerText.substr(3));
-
-  if (star.checked) {
-    qElement.stars =
-      (qElement.stars * qElement.numRatings + 1) / (qElement.numRatings + 1);
-    qElement.numRatings++;
+  if (starEl.checked) {
+    try {
+      const response = await fetch("/api/star", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ question: questionEl.innerText.substr(3) }),
+      });
+      if (response.msg) {
+        window.location.href = "index.html";
+        throw msg;
+      }
+      const questions = await response.json();
+      localStorage.setItem("questions", JSON.stringify(questions));
+    } catch (error) {
+      console.log(error);
+    }
   } else {
-    qElement.stars =
-      (qElement.stars * qElement.numRatings - 1) / (qElement.numRatings + 1);
-    qElement.numRatings++;
+    try {
+      const response = await fetch("/api/star", {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ question: question.innerText.substr(3) }),
+      });
+      if (response.msg) {
+        window.location.href = "index.html";
+        throw msg;
+      }
+      const questions = await response.json();
+      localStorage.setItem("questions", JSON.stringify(questions));
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  updateStars(qElement);
-}
-
-async function updateStars(question) {
-  try {
-    const response = await fetch("/api/star", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(question),
-    });
-    if (questions.msg) {
-      window.location.href = "index.html";
-      throw msg;
-    }
-    const questions = await response.json();
-    localStorage.setItem("questions", JSON.stringify(questions));
-  } catch {}
+  topQuestions();
 }
 
 async function loadQuestions() {
@@ -213,7 +219,9 @@ async function updateQuestions(newQuestion) {
       throw msg;
     }
     localStorage.setItem("questions", JSON.stringify(questions));
-  } catch {}
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function setBackground() {

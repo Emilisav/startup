@@ -122,14 +122,21 @@ User: The role that provides input for chat completions1. */
 
 // Submit Questions
 secureApiRouter.post("/questions", (req, res) => {
-  questions = updateQuestion(req.body, questions);
+  questions = updateQuestion(req.body);
 
   res.send(questions);
 });
 
 // Update stars
-secureApiRouter.post("/star", (req, res) => {
-  questions = updateStar(req.body, questions);
+secureApiRouter.post("/star", async (req, res) => {
+  questions = await db.incStar(req.body.question);
+
+  res.send(questions);
+});
+
+// Update stars
+secureApiRouter.delete("/star", async (req, res) => {
+  questions = await db.decStar(req.body.question);
 
   res.send(questions);
 });

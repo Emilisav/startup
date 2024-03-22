@@ -52,10 +52,32 @@ function getQuestions() {
   return cursor.toArray();
 }
 
+async function incStar(question) {
+  let el = await questionCollection.findOne({ question: question });
+
+  el.stars++;
+
+  questionCollection.replaceOne({ question: question }, el);
+
+  return getQuestions();
+}
+
+async function decStar(question) {
+  let el = await questionCollection.findOne({ question: question });
+
+  el.stars--;
+
+  questionCollection.replaceOne({ question: question }, el);
+
+  return getQuestions();
+}
+
 module.exports = {
   getUser,
   getUserByToken,
   createUser,
   addQuestion,
   getQuestions,
+  incStar,
+  decStar,
 };
