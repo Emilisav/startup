@@ -93,9 +93,9 @@ For this deliverable I built out the structure of my application using HTML.
 
 For this deliverable I associate the questions with the logged in user. I stored the questions in the database.
 
-- **MongoDB Atlas database created** - It is being stored
+- **MongoDB Atlas database created** - data is being stored in MongoDB Atlas
 - **Stores data in MongoDB** - When I restart the server, the data is still there
-- **User registration** - Creates a new account in the database, everything is hashed with bcrypt
+- **User registration** - Creates a new account in the database is there is no account with that username, else check that the password matches, everything is hashed with bcrypt
 - **existing user** - Stores the questions under the same user if the user already exists, or loggs you into the guest account if you click guest
 - **Use MongoDB to store credentials** - Stores both user and their questions.
-- **Restricts functionality** - You cannot get questions, send questions, or ask chatGPT anything until you have logged in. It will send you to the login page if you try to do anything.
+- **Restricts functionality** - You cannot get questions beside the default questions, send questions, or ask chatGPT anything until you have logged in with the correct password. It will send you to the login page if you try to send questions.
