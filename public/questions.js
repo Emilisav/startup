@@ -1,10 +1,9 @@
 localStorage.setItem("questions", []);
 
 setTitle();
-topQuestions();
+setInterval(getNewestQuestions, 5000);
 setBackground();
-
-setInterval(getNewestQuestions, 1000);
+topQuestions();
 
 function getName() {
   if (
@@ -59,6 +58,21 @@ async function question() {
     question.value = "";
   } else {
     question.value = "Question already exists";
+    try {
+      const response = await fetch("/api/star", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ question: question }),
+      });
+      if (response.msg) {
+        window.location.href = "index.html";
+        throw msg;
+      }
+      const questions = await response.json();
+      localStorage.setItem("questions", JSON.stringify(questions));
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
@@ -91,6 +105,7 @@ async function addQuestion(question) {
 }
 
 async function topQuestions() {
+  await new Promise((resolve) => setTimeout(resolve, 100));
   questions = await loadQuestions();
   if (questions.length > 5) {
     questions.sort((a, b) => b.stars - a.stars);
@@ -193,7 +208,6 @@ async function loadQuestions() {
     const qResponse = await fetch("/api/questions");
     let questions = await qResponse.json();
     if (questions.msg) {
-      window.location.href = "index.html";
       throw msg;
     }
     // Save the questions in case we go offline in the future
@@ -223,6 +237,8 @@ async function updateQuestions(newQuestion) {
       window.location.href = "index.html";
       throw msg;
     }
+    this.broadcastEvent(userName, newQuestion);
+
     localStorage.setItem("questions", JSON.stringify(questions));
   } catch (error) {
     console.log(error);
@@ -240,4 +256,45 @@ async function setBackground() {
       const imgUrl = `https://picsum.photos/id/${data[0].id}/${width}/${height}`;
       containerEl.setAttribute("style", `background-image: url(${imgUrl})`);
     });
+}
+
+function goBack() {
+  localStorage.removeItem("userName");
+  try {
+    fetch(`/api/auth/logout`, {
+      method: "delete",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Functionality for peer communication using WebSocket
+
+function configureWebSocket() {
+  const protocol = window.location.protocol === "http:" ? "ws" : "wss";
+  this.socket = new WebSocket(`${protocol}://${window.location.host}/ws`);
+  this.socket.onopen = (event) => {
+    this.displayMsg("connected");
+  };
+  this.socket.onclose = (event) => {
+    this.displayMsg("disconnected");
+  };
+  this.socket.onmessage = async (event) => {
+    const msg = JSON.parse(await event.data.text());
+    this.displayMsg(`${msg.from} added ${msg.question}`);
+  };
+}
+
+function displayMsg(cls, from, msg) {
+  const chatText = document.querySelector("#player-messages");
+  chatText.innerHTML = `<div class="event">${msg}</div>` + chatText.innerHTML;
+}
+
+function broadcastEvent(from, question) {
+  const event = {
+    from: from,
+    question: value,
+  };
+  this.socket.send(JSON.stringify(event));
 }

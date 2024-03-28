@@ -49,26 +49,28 @@ function addQuestion(score) {
 
 function getQuestions() {
   const cursor = questionCollection.find();
+  
   return cursor.toArray();
 }
 
 async function incStar(question) {
   let el = await questionCollection.findOne({ question: question });
 
-  el.stars++;
+  if (el) {
+    el.stars++;
 
-  questionCollection.replaceOne({ question: question }, el);
-
+    questionCollection.replaceOne({ question: question }, el);
+  }
   return getQuestions();
 }
 
 async function decStar(question) {
   let el = await questionCollection.findOne({ question: question });
+  if (el) {
+    el.stars--;
 
-  el.stars--;
-
-  questionCollection.replaceOne({ question: question }, el);
-
+    questionCollection.replaceOne({ question: question }, el);
+  }
   return getQuestions();
 }
 

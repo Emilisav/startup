@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const app = express();
 const db = require("./db.js");
+const { newQ } = require("./newQuestionsProxy.js");
 
 const authCookieName = "token";
 
@@ -27,7 +28,7 @@ app.use(`/api`, apiRouter);
 
 // CreateAuth token for a new user
 apiRouter.post("/auth/login", async (req, res) => {
-  const user = await db.getUser(req.body.email);
+  const user = await db.getUser(req.body.name);
 
   if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
@@ -146,10 +147,6 @@ app.use((_req, res) => {
   res.sendFile("index.html", { root: "public/" });
 });
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
-
 // updateScores considers a new score for inclusion in the high scores.
 // The high scores are saved in memory and disappear whenever the service is restarted.
 let questions = [];
@@ -215,7 +212,7 @@ function updateStar(newQuestion, questions) {
   return questions;
 }
 
-setInterval(getNewestQuestions, 10000);
+//setInterval(getNewestQuestions, 10000);
 
 function getNewestQuestions() {
   let userName = "websocket";
@@ -245,3 +242,9 @@ function setAuthCookie(res, authToken) {
     sameSite: "strict",
   });
 }
+
+const httpService = app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});
+
+newQuestionsProxy(httpService);
