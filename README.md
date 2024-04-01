@@ -99,3 +99,12 @@ For this deliverable I associate the questions with the logged in user. I stored
 - **existing user** - Stores the questions under the same user if the user already exists, or loggs you into the guest account if you click guest
 - **Use MongoDB to store credentials** - Stores both user and their questions.
 - **Restricts functionality** - You cannot get questions beside the default questions, send questions, or ask chatGPT anything until you have logged in with the correct password. It will send you to the login page if you try to send questions.
+
+## WebSocket deliverable
+
+For this deliverable I used webSocket to show the newest questions on the frontend in realtime.
+
+- **Backend listens for WebSocket connection** - done! in newQuestionsProxy.js
+- **Frontend makes WebSocket connection** - done! in configureWebSocket() in questions.js
+- **Data sent over WebSocket connection** - done! the question
+- **WebSocket data displayed** - All user questions display in realtime 
