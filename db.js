@@ -22,56 +22,84 @@ const questionCollection = db.collection("question");
 });
 
 function getUser(name) {
-  return userCollection.findOne({ name: name });
+  try {
+    return userCollection.findOne({ name: name });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function getUserByToken(token) {
-  return userCollection.findOne({ token: token });
+  try {
+    return userCollection.findOne({ token: token });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function createUser(name, password) {
-  // Hash the password before we insert it into the database
-  const passwordHash = await bcrypt.hash(password, 10);
+  try {
+    // Hash the password before we insert it into the database
+    const passwordHash = await bcrypt.hash(password, 10);
 
-  const user = {
-    name: name,
-    password: passwordHash,
-    token: uuid.v4(),
-  };
-  await userCollection.insertOne(user);
+    const user = {
+      name: name,
+      password: passwordHash,
+      token: uuid.v4(),
+    };
+    await userCollection.insertOne(user);
 
-  return user;
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function addQuestion(score) {
-  questionCollection.insertOne(score);
+  try {
+    questionCollection.insertOne(score);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function getQuestions() {
-  const cursor = questionCollection.find();
-  
-  return cursor.toArray();
+  try {
+    const cursor = questionCollection.find();
+
+    return cursor.toArray();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function incStar(question) {
-  let el = await questionCollection.findOne({ question: question });
+  try {
+    let el = await questionCollection.findOne({ question: question });
 
-  if (el) {
-    el.stars++;
+    if (el) {
+      el.stars++;
 
-    questionCollection.replaceOne({ question: question }, el);
+      questionCollection.replaceOne({ question: question }, el);
+    }
+    return getQuestions();
+  } catch (error) {
+    console.log(error);
   }
-  return getQuestions();
 }
 
 async function decStar(question) {
-  let el = await questionCollection.findOne({ question: question });
-  if (el) {
-    el.stars--;
+  try {
+    let el = await questionCollection.findOne({ question: question });
+    if (el) {
+      el.stars--;
 
-    questionCollection.replaceOne({ question: question }, el);
+      questionCollection.replaceOne({ question: question }, el);
+    }
+    return getQuestions();
+  } catch (error) {
+    console.log(error);
   }
-  return getQuestions();
 }
 
 module.exports = {

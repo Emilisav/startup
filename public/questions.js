@@ -1,9 +1,12 @@
 localStorage.setItem("questions", []);
 
 setTitle();
-setInterval(getNewestQuestions, 5000);
+getNewestQuestions(null);
 setBackground();
 topQuestions();
+
+let socket;
+configureWebSocket();
 
 function getName() {
   if (
@@ -21,14 +24,19 @@ function setTitle() {
   title.innerText = "Welcome to TalkShow " + getName() + "!";
 }
 
-async function getNewestQuestions() {
+async function getNewestQuestions(event) {
   // Populate Questions
 
   let questions = await loadQuestions();
   if (questions.length > 3) {
     questions.sort((a, b) => b.date - a.date);
 
-    updateNewQuestion(questions[2], "s1");
+    if (event == null) {
+      updateNewQuestion(questions[2], "s1");
+    } else {
+      updateNewQuestion(event, "s1");
+    }
+
     updateNewQuestion(questions[1], "s2");
     updateNewQuestion(questions[0], "s3");
   }
@@ -125,7 +133,7 @@ function updateTopQuestion(question, id) {
 function updateNewQuestion(question, id) {
   setStars(question.stars, id);
   let questionText = document.getElementById(id);
-  questionText.innerHTML = question.question;
+  questionText.innerHTML = `${question.userName} added ${question.question}`;
 }
 
 async function chatGPT() {
@@ -237,7 +245,7 @@ async function updateQuestions(newQuestion) {
       window.location.href = "index.html";
       throw msg;
     }
-    this.broadcastEvent(userName, newQuestion);
+    broadcastEvent(newQuestion);
 
     localStorage.setItem("questions", JSON.stringify(questions));
   } catch (error) {
@@ -273,28 +281,23 @@ function goBack() {
 
 function configureWebSocket() {
   const protocol = window.location.protocol === "http:" ? "ws" : "wss";
-  this.socket = new WebSocket(`${protocol}://${window.location.host}/ws`);
-  this.socket.onopen = (event) => {
-    this.displayMsg("connected");
+  socket = new WebSocket(`${protocol}://${window.location.host}/ws`);
+  socket.onopen = (event) => {
+    console.log("connected");
   };
-  this.socket.onclose = (event) => {
-    this.displayMsg("disconnected");
+  socket.onclose = (event) => {
+    console.log("disconnected");
   };
-  this.socket.onmessage = async (event) => {
-    const msg = JSON.parse(await event.data.text());
-    this.displayMsg(`${msg.from} added ${msg.question}`);
+  socket.onmessage = async (event) => {
+    getNewestQuestions(JSON.parse(await event.data.text()));
   };
 }
 
-function displayMsg(cls, from, msg) {
-  const chatText = document.querySelector("#player-messages");
-  chatText.innerHTML = `<div class="event">${msg}</div>` + chatText.innerHTML;
-}
-
-function broadcastEvent(from, question) {
+function broadcastEvent(question) {
   const event = {
-    from: from,
-    question: value,
+    userName: question.userName,
+    question: question.question,
+    stars: question.stars,
   };
-  this.socket.send(JSON.stringify(event));
+  socket.send(JSON.stringify(event));
 }

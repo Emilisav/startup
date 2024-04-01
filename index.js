@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const app = express();
 const db = require("./db.js");
-const { newQ } = require("./newQuestionsProxy.js");
+const { newQuestionsProxy } = require("./newQuestionsProxy.js");
 
 const authCookieName = "token";
 
@@ -212,7 +212,7 @@ function updateStar(newQuestion, questions) {
   return questions;
 }
 
-//setInterval(getNewestQuestions, 10000);
+/*setInterval(getNewestQuestions, 10000);
 
 function getNewestQuestions() {
   let userName = "websocket";
@@ -227,7 +227,7 @@ function getNewestQuestions() {
     numRatings: ratings,
     date: time,
   });
-}
+}*/
 
 // Default error handler
 app.use(function (err, req, res, next) {
