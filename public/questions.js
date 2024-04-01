@@ -32,13 +32,13 @@ async function getNewestQuestions(event) {
     questions.sort((a, b) => b.date - a.date);
 
     if (event == null) {
-      updateNewQuestion(questions[2], "s1");
+      updateNewQuestion(questions[0], "s3");
     } else {
-      updateNewQuestion(event, "s1");
+      updateNewQuestion(event, "s3");
     }
 
     updateNewQuestion(questions[1], "s2");
-    updateNewQuestion(questions[0], "s3");
+    updateNewQuestion(questions[2], "s1");
   }
 }
 
