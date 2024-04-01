@@ -106,5 +106,5 @@ For this deliverable I used webSocket to show the newest questions on the fronte
 
 - **Backend listens for WebSocket connection** - done! in newQuestionsProxy.js
 - **Frontend makes WebSocket connection** - done! in configureWebSocket() in questions.js
-- **Data sent over WebSocket connection** - done! the question
-- **WebSocket data displayed** - All user questions display in realtime 
+- **Data sent over WebSocket connection** - done! the latest question, as in s3 in getNewestQuestions() in question.js
+- **WebSocket data displayed** - s3 question displayed
