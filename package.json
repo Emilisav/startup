@@ -1,0 +1,16 @@
+{
+  "name": "startup",
+  "version": "1.0.0",
+  "description": "[notes](./notes.md)\r [startup](https://startup.talkshow.click)\r [AWS](https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1)",
+  "main": "login.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^5.2.8"
+  }
+}

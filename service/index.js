@@ -212,23 +212,6 @@ function updateStar(newQuestion, questions) {
   return questions;
 }
 
-/*setInterval(getNewestQuestions, 10000);
-
-function getNewestQuestions() {
-  let userName = "websocket";
-  let time = Date.now();
-  let stars = 0;
-  let ratings = 0;
-
-  updateQuestion({
-    question: `new question ` + Math.floor(Math.random() * 3000),
-    userName: userName,
-    stars: stars,
-    numRatings: ratings,
-    date: time,
-  });
-}*/
-
 // Default error handler
 app.use(function (err, req, res, next) {
   res.status(500).send({ type: err.name, message: err.message });
