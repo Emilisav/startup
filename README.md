@@ -98,8 +98,8 @@ For this deliverable I associate the questions with the logged in user. I stored
 - **User registration** - Creates a new account in the database is there is no account with that username, else check that the password matches, everything is hashed with bcrypt
 - **existing user** - Stores the questions under the same user if the user already exists, or loggs you into the guest account if you click guest
 - **Use MongoDB to store credentials** - Stores both user and their questions.
-- **Restricts functionality** - You cannot get questions beside the default questions, send questions, or ask chatGPT anything until you have logged in with the correct password. It will send you to the login page if you try to send questions.
-
+- **Restricts functionality** - You cannot get questions beside the default questio.
+ns, send questions, or ask chatGPT anything until you have logged in with the correct password. It will send you to the login page if you try to send questions
 ## WebSocket deliverable
 
 For this deliverable I used webSocket to show the newest questions on the frontend in realtime.
@@ -108,3 +108,12 @@ For this deliverable I used webSocket to show the newest questions on the fronte
 - **Frontend makes WebSocket connection** - done! in configureWebSocket() in questions.js
 - **Data sent over WebSocket connection** - done! the latest question, as in s3 in getNewestQuestions() in question.js
 - **WebSocket data displayed** - s3 question displayed
+
+## React deliverable
+
+For this deliverable I converted the application over to use Vite/React
+
+- [x] **Bundled and transpiled** - done!
+- [x] **Components** - Login and questions are all components.
+- [x] **Router** - Routing between login and question components.
+- [x] **Hooks** - tracks questions.
