@@ -16,6 +16,18 @@ function App() {
     : AuthState.Unauthenticated;
   const [authState, setAuthState] = React.useState(currentAuthState);
 
+  function goBack() {
+    localStorage.removeItem("userName");
+    setAuthState(AuthState.Unauthenticated);
+    try {
+      fetch(`/api/auth/logout`, {
+        method: "delete",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <BrowserRouter>
       <div className="body">
@@ -24,13 +36,6 @@ function App() {
 
           <nav className="navbar">
             <menu className="navbar-nav">
-              {authState === AuthState.Authenticated && (
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="">
-                    Logout
-                  </NavLink>
-                </li>
-              )}
               {authState === AuthState.Authenticated && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="questions">
@@ -45,8 +50,27 @@ function App() {
                   </NavLink>
                 </li>
               )}
+              {authState === AuthState.Authenticated && (
+                <li className="nav-item">
+                  <NavLink className="nav-link logout" to="">
+                    <button
+                      class="btn btn-sm btn-outline-secondary"
+                      onclick="goBack()"
+                      type="submit"
+                    >
+                      Back to Login
+                    </button>
+                  </NavLink>
+                </li>
+              )}
             </menu>
           </nav>
+          <Button
+            variant="btn btn-sm btn-outline-secondary"
+            onClick={() => goBack()}
+          >
+            Logout
+          </Button>
         </header>
 
         <Routes>
@@ -71,7 +95,6 @@ function App() {
           <Route path="/add" element={<Add userName={userName} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-
 
         <footer>
           <span className="text-reset">Emily De Graw</span>
