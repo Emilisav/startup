@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import Button from "react-bootstrap/Button";
 import { Login } from "./login/login";
 import { Questions } from "./questions/questions";
 import { Add } from "./add/add";
@@ -32,7 +33,7 @@ function App() {
     <BrowserRouter>
       <div className="body">
         <header>
-          <h1>Welcome to TalkShow!</h1>
+          <h1>Welcome to TalkShow {userName}!</h1>
 
           <nav className="navbar">
             <menu className="navbar-nav">
@@ -50,27 +51,18 @@ function App() {
                   </NavLink>
                 </li>
               )}
-              {authState === AuthState.Authenticated && (
-                <li className="nav-item">
-                  <NavLink className="nav-link logout" to="">
-                    <button
-                      class="btn btn-sm btn-outline-secondary"
-                      onclick="goBack()"
-                      type="submit"
-                    >
-                      Back to Login
-                    </button>
-                  </NavLink>
-                </li>
-              )}
             </menu>
+            {authState === AuthState.Authenticated && (
+              <NavLink className="nav-link" to="">
+                <Button
+                  variant="btn btn-sm btn-outline-secondary"
+                  onClick={() => goBack()}
+                >
+                  Logout
+                </Button>
+              </NavLink>
+            )}
           </nav>
-          <Button
-            variant="btn btn-sm btn-outline-secondary"
-            onClick={() => goBack()}
-          >
-            Logout
-          </Button>
         </header>
 
         <Routes>
@@ -106,11 +98,7 @@ function App() {
 }
 
 function NotFound() {
-  return (
-    <main className="container-fluid bg-secondary text-center">
-      404: Return to sender. Address unknown.
-    </main>
-  );
+  return <main>404: Return to sender. Address unknown.</main>;
 }
 
 export default App;

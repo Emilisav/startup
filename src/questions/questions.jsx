@@ -20,19 +20,18 @@ export function Questions() {
   }, []);
 
   return (
-    <main className="container-fluid bg-secondary text-center">
+    <main>
       <h2>Top Questions</h2>
       <div id="top">
-        <h2>These are the top questions</h2>
-        <table class="table">
+        <table className="table">
           <tr>
             <td id="q1" data-th="Question">
               1. What number would you like to be on a sports team and why?
             </td>
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="q11" onclick="star(id)" type="checkbox" />
+              <span className="stars">
+                <label className="container">
+                  <input id="q11" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -51,8 +50,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q12" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q12" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -71,8 +70,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q13" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q13" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -91,8 +90,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q14" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q14" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -111,8 +110,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q15" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q15" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -140,9 +139,9 @@ export function Questions() {
               thing to happen to you?
             </td>
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="q21" onclick="star(id)" type="checkbox" checked />
+              <span className="stars">
+                <label className="container">
+                  <input id="q21" onClick="star(id)" type="checkbox" checked />
                   <svg
                     height="24px"
                     checked
@@ -161,8 +160,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q22" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q22" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -181,8 +180,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q23" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q23" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -201,8 +200,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q24" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q24" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -221,8 +220,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q25" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q25" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -249,9 +248,9 @@ export function Questions() {
               3. What type of books do you take on vacation?
             </td>
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="q31" onclick="star(id)" type="checkbox" />
+              <span className="stars">
+                <label className="container">
+                  <input id="q31" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -270,8 +269,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q32" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q32" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -290,8 +289,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q33" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q33" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -310,8 +309,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q34" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q34" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -330,8 +329,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q35" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q35" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -358,9 +357,9 @@ export function Questions() {
               4. What event do you wish you had season tickets to?
             </td>
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="q41" onclick="star(id)" type="checkbox" />
+              <span className="stars">
+                <label className="container">
+                  <input id="q41" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -379,8 +378,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q42" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q42" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -399,8 +398,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q43" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q43" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -419,8 +418,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q44" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q44" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -439,8 +438,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q45" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q45" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -467,9 +466,9 @@ export function Questions() {
               5. What's your gift?
             </td>
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="q51" onclick="star(id)" type="checkbox" />
+              <span className="stars">
+                <label className="container">
+                  <input id="q51" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -488,8 +487,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q52" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q52" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -508,8 +507,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q53" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q53" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -528,8 +527,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q54" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q54" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -548,8 +547,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="q55" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="q55" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -575,16 +574,16 @@ export function Questions() {
       </div>
       <div id="new">
         <h2>These are the latest questions!</h2>
-        <table class="table" id="player-messages">
+        <table className="table" id="player-messages">
           <tr>
             <td id="s1" data-th="Question">
               What is your favorite holiday and why? -BobTheBuilder
             </td>
 
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="s11" onclick="star(id)" type="checkbox" />
+              <span className="stars">
+                <label className="container">
+                  <input id="s11" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -603,8 +602,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s12" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s12" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -623,8 +622,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s13" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s13" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -643,8 +642,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s14" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s14" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -663,8 +662,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s15" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s15" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -691,9 +690,9 @@ export function Questions() {
               Where is your favorite quiet place? - Amy334
             </td>
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="s21" onclick="star(id)" type="checkbox" />
+              <span className="stars">
+                <label className="container">
+                  <input id="s21" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -712,8 +711,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s22" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s22" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -732,8 +731,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s23" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s23" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -752,8 +751,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s24" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s24" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -772,8 +771,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s25" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s25" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -801,9 +800,9 @@ export function Questions() {
               ddd777
             </td>
             <td data-th="Stars">
-              <span class="stars">
-                <label class="container">
-                  <input id="s31" onclick="star(id)" type="checkbox" />
+              <span className="stars">
+                <label className="container">
+                  <input id="s31" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -822,8 +821,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s32" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s32" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -842,8 +841,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s33" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s33" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -862,8 +861,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s34" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s34" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -882,8 +881,8 @@ export function Questions() {
                     </g>
                   </svg>{" "}
                 </label>
-                <label class="container">
-                  <input id="s35" onclick="star(id)" type="checkbox" />
+                <label className="container">
+                  <input id="s35" onClick="star(id)" type="checkbox" />
                   <svg
                     height="24px"
                     checked
@@ -907,7 +906,6 @@ export function Questions() {
           </tr>
         </table>
       </div>
-      <tbody id="scores">{scoreRows}</tbody>
     </main>
   );
 }

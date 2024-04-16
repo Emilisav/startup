@@ -27,6 +27,10 @@ header {
   justify-content: start;
 }
 
+.add {
+  color: #6411d8;
+}
+
 #back {
   flex: 1;
   margin-right: 10px;
