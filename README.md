@@ -113,7 +113,7 @@ For this deliverable I used webSocket to show the newest questions on the fronte
 
 For this deliverable I converted the application over to use Vite/React
 
-- [x] **Bundled and transpiled** - done!
-- [x] **Components** - Login and questions are all components.
+- [x] **Bundled and transpiled** - done
+- [x] **Components** - authentication and questions are components
 - [x] **Router** - Routing between login and question components.
-- [x] **Hooks** - tracks questions.
+- [x] **Hooks** - tracks the username.
