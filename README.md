@@ -1,3 +1,47 @@
+```mermaid
+sequenceDiagram
+    actor User
+    participant FavoritesPlayer
+    participant MusicDB
+
+    User->>FavoritesPlayer: playFavorites()
+    activate FavoritesPlayer
+    
+    loop for each song in favorites
+        FavoritesPlayer->>MusicDB: getSong(songName:String)
+        activate MusicDB
+        MusicDB-->>FavoritesPlayer: return Song
+        deactivate MusicDB
+        
+        FavoritesPlayer->>FavoritesPlayer: playSong(Song)
+        activate FavoritesPlayer
+        deactivate FavoritesPlayer
+    end
+    deactivate FavoritesPlayer
+```
+    sequenceDiagram
+    participant FavoritesPlayer
+    participant MusicDB
+
+    Note over FavoritesPlayer: playFavorites()
+    activate FavoritesPlayer
+    FavoritesPlayer->>FavoritesPlayer: playSongs(favorites)
+    activate FavoritesPlayer
+
+    loop for each song in favorites
+        FavoritesPlayer->>MusicDB: getSong(String)
+        activate MusicDB
+        MusicDB-->>FavoritesPlayer: return Song
+        deactivate MusicDB
+        
+        FavoritesPlayer->>FavoritesPlayer: playSong(Song)
+        activate FavoritesPlayer
+        deactivate FavoritesPlayer
+    end
+    deactivate FavoritesPlayer
+    deactivate FavoritesPlayer
+
+
 ### Talkshow
 [notes](./notes.md)
 [startup](https://startup.talkshow.click)
