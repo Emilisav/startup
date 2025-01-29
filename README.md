@@ -20,12 +20,12 @@ sequenceDiagram
     deactivate FavoritesPlayer
 ```
 ```mermaid
-
+    actor User
     sequenceDiagram
     participant FavoritesPlayer
     participant MusicDB
 
-    Note over FavoritesPlayer: playFavorites()
+    User->>FavoritesPlayer: playFavorites()
     activate FavoritesPlayer
     FavoritesPlayer->>FavoritesPlayer: playSongs(favorites)
     activate FavoritesPlayer
