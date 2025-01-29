@@ -20,8 +20,8 @@ sequenceDiagram
     deactivate FavoritesPlayer
 ```
 ```mermaid
-    actor User
     sequenceDiagram
+    actor User
     participant FavoritesPlayer
     participant MusicDB
 
