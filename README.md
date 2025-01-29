@@ -19,6 +19,8 @@ sequenceDiagram
     end
     deactivate FavoritesPlayer
 ```
+```mermaid
+
     sequenceDiagram
     participant FavoritesPlayer
     participant MusicDB
@@ -40,7 +42,7 @@ sequenceDiagram
     end
     deactivate FavoritesPlayer
     deactivate FavoritesPlayer
-
+```
 
 ### Talkshow
 [notes](./notes.md)
