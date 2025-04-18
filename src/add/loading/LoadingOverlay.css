@@ -1,0 +1,159 @@
+/* LoadingOverlay.css */
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(214, 195, 250, 0.7); /* pastel lavender overlay */
+  z-index: 9999;
+}
+
+#load {
+  position: absolute;
+  width: 600px;
+  height: 36px;
+  left: 50%;
+  top: 40%;
+  margin-left: -300px;
+  overflow: visible;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+/* Pastel rainbow for loader bars */
+#load div {
+  position: absolute;
+  width: 20px;
+  height: 36px;
+  opacity: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  animation: move 2s linear infinite;
+  -o-animation: move 2s linear infinite;
+  -moz-animation: move 2s linear infinite;
+  -webkit-animation: move 2s linear infinite;
+  transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+}
+
+/* Pastel color sequence for each bar */
+#load div:nth-child(1) {
+  color: #ffd6e0;
+} /* pastel pink */
+#load div:nth-child(2) {
+  color: #b6e2d3;
+  animation-delay: 0.2s;
+} /* pastel mint */
+#load div:nth-child(3) {
+  color: #bad8f4;
+  animation-delay: 0.4s;
+} /* pastel blue */
+#load div:nth-child(4) {
+  color: #f9e6f7;
+  animation-delay: 0.6s;
+} /* lighter pastel pink */
+#load div:nth-child(5) {
+  color: #d6c3fa;
+  animation-delay: 0.8s;
+} /* pastel lavender */
+#load div:nth-child(6) {
+  color: #fff0f6;
+  animation-delay: 1s;
+} /* very light pink */
+#load div:nth-child(7) {
+  color: #8e9aaf;
+  animation-delay: 1.2s;
+} /* muted lavender */
+
+@keyframes move {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  35% {
+    left: 41%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  65% {
+    left: 59%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: rotate(-180deg);
+    opacity: 0;
+  }
+}
+
+@-moz-keyframes move {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  35% {
+    left: 41%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  65% {
+    left: 59%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: rotate(-180deg);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes move {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  35% {
+    left: 41%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  65% {
+    left: 59%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: rotate(-180deg);
+    opacity: 0;
+  }
+}
+
+@-o-keyframes move {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  35% {
+    left: 41%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  65% {
+    left: 59%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: rotate(-180deg);
+    opacity: 0;
+  }
+}

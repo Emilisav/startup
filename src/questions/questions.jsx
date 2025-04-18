@@ -1,10 +1,27 @@
-import React from "react";
-import "./questions.css";
+import React, { useState, useEffect } from "react";
 
-export function Questions() {
-  const [questions, setQuestions] = React.useState([]);
+export default function Questions() {
+  const [questions, setQuestions] = useState([]);
+  const [joke, setJoke] = useState("");
 
-  React.useEffect(() => {
+  // Fetch joke
+  useEffect(() => {
+    const fetchJoke = async () => {
+      try {
+        let response = await fetch("https://icanhazdadjoke.com/", {
+          headers: { Accept: "application/json" },
+        });
+        let data = await response.json();
+        setJoke(data.joke);
+      } catch (error) {
+        setJoke("Failed to load joke.");
+      }
+    };
+    fetchJoke();
+  }, []);
+
+  // Fetch questions
+  useEffect(() => {
     fetch("/api/questions")
       .then((response) => response.json())
       .then((questions) => {
@@ -20,6 +37,17 @@ export function Questions() {
   }, []);
 
   return (
+    <main className="home">
+      <div id="joke-container">
+        <h2>Random Joke of the Day</h2>
+        <div id="joke">{joke}</div>
+      </div>
+      {/* Render your questions here */}
+    </main>
+  );
+}
+
+/*return (
     <main>
       <h2>Top Questions</h2>
       <div id="top">
@@ -907,5 +935,4 @@ export function Questions() {
         </table>
       </div>
     </main>
-  );
-}
+  );*/

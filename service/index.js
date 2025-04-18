@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const db = require("./db.js");
 const { newQuestionsProxy } = require("./newQuestionsProxy.js");
+const uuid = require("uuid");
 
 const authCookieName = "token";
 
@@ -32,9 +33,10 @@ apiRouter.post("/auth/login", async (req, res) => {
 
   if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
+      user.token = uuid.v4();
+      await db.updateUser(user);
       setAuthCookie(res, user.token);
-      res.send({ id: user._id });
-      return;
+      return res.send({ id: user._id });
     }
 
     res.status(401).send({ msg: "Unauthorized" });
@@ -51,7 +53,14 @@ apiRouter.post("/auth/login", async (req, res) => {
 });
 
 // DeleteAuth token if stored in cookie
-apiRouter.delete("/auth/logout", (_req, res) => {
+apiRouter.delete("/auth/logout", async (req, res) => {
+  const token = req.cookies[authCookieName];
+  const user = await db.getUserByToken(token);
+  if (user) {
+    user.token = null;
+    await db.updateUser(user);
+  }
+
   res.clearCookie(authCookieName);
   res.status(204).end();
 });

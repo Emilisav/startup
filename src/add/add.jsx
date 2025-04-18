@@ -1,40 +1,75 @@
-import React from "react";
-import "./add.css";
+import React, { useState } from "react";
+import LoadingOverlay from "./loading/LoadingOverlay";
 
 export function Add() {
+  const [question, setQuestion] = useState("");
+  const [helpQuestion, setHelpQuestion] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleAddQuestion = (e) => {
+    e.preventDefault();
+    alert(`Question added: ${question}`);
+    setQuestion("");
+  };
+
+  const handleChatGPT = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // Simulate API call to ChatGPT
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      alert(`ChatGPT called with: ${helpQuestion}`);
+      setHelpQuestion("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div id="add">
       <h1>Add a question</h1>
-      <div class="mb-3">
-        <label class="form-label">Question</label>
-        <input
-          onfocus="this.value=''"
-          type="text"
-          required
-          class="form-control"
-          id="addQuestion"
-          placeholder="Your question here"
-        />
-      </div>
-      <button type="submit" onclick="question()">
-        Add Question
-      </button>
+      <form onSubmit={handleAddQuestion}>
+        <div className="mb-3">
+          <label className="form-label" htmlFor="addQuestion">
+            Question
+          </label>
+          <input
+            type="text"
+            required
+            className="form-control"
+            id="addQuestion"
+            placeholder="Your question here"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+          />
+        </div>
+        <button type="submit">Add Question</button>
+      </form>
 
-      <div class="mb-3" id="gpt">
-        <label class="form-label">Get help from chatGPT</label>
-        <input
-          onfocus="this.value=''"
-          type="text"
-          required
-          class="form-control"
-          id="helpQuestion"
-          placeholder="What do I ask someone who like oranges to discover what else they like?"
-        />
-      </div>
+      <form onSubmit={handleChatGPT}>
+        <div className="mb-3" id="gpt">
+          <label className="form-label" htmlFor="helpQuestion">
+            Get help from chatGPT
+          </label>
+          <input
+            type="text"
+            required
+            className="form-control"
+            id="helpQuestion"
+            placeholder="What do I ask someone who likes oranges to discover what else they like?"
+            value={helpQuestion}
+            onChange={(e) => setHelpQuestion(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+        <button type="submit" disabled={loading}>
+          Call ChatGPT
+        </button>
+      </form>
 
-      <button type="submit" onclick="chatGPT()">
-        Call ChatGPT
-      </button>
+      {loading && <LoadingOverlay />}
     </div>
   );
 }
+
+export default Add;

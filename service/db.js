@@ -1,6 +1,4 @@
 const { MongoClient } = require("mongodb");
-const bcrypt = require("bcrypt");
-const uuid = require("uuid");
 const config = require("./dbConfig.json");
 
 const url = `mongodb+srv://${config.userName}:${config.password}@${config.hostname}`;
@@ -50,6 +48,14 @@ async function createUser(name, password) {
     await userCollection.insertOne(user);
 
     return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function updateUser(user) {
+  try {
+    await userCollection.updateOne({ name: user.name }, { $set: user });
   } catch (error) {
     console.log(error);
   }
@@ -105,6 +111,7 @@ async function decStar(question) {
 module.exports = {
   getUser,
   getUserByToken,
+  updateUser,
   createUser,
   addQuestion,
   getQuestions,

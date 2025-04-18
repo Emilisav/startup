@@ -1,70 +1,60 @@
 import React from "react";
-import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
-import Button from "react-bootstrap/Button";
+import { useLocation, Route, Routes, useNavigate } from "react-router-dom";
 import { Login } from "./login/login";
-import { Questions } from "./questions/questions";
-import { Add } from "./add/add";
 import { AuthState } from "./login/authState";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./app.css";
+import HeaderPost from "./header/headerPost";
+import HeaderPre from "./header/headerPre";
+import Footer from "./footer/footer";
+import Questions from "./questions/questions";
+import Add from "./add/add";
+import Petals from "./petals/Petals.jsx";
+import "./petals/petals.css";
 
 function App() {
+  const navigate = useNavigate();
   const [userName, setUserName] = React.useState(
     localStorage.getItem("userName") || ""
   );
-  const currentAuthState = userName
-    ? AuthState.Authenticated
-    : AuthState.Unauthenticated;
-  const [authState, setAuthState] = React.useState(currentAuthState);
+  const [authState, setAuthState] = React.useState(
+    userName ? AuthState.Authenticated : AuthState.Unauthenticated
+  );
 
-  function goBack() {
-    localStorage.removeItem("userName");
-    setAuthState(AuthState.Unauthenticated);
-    try {
-      fetch(`/api/auth/logout`, {
-        method: "delete",
-      });
-    } catch (error) {
-      console.log(error);
+  const handleAuthChange = (newUserName, newAuthState) => {
+    setUserName(newUserName);
+    setAuthState(newAuthState);
+    if (newAuthState === AuthState.Authenticated) {
+      localStorage.setItem("userName", newUserName);
+    } else {
+      localStorage.removeItem("userName");
     }
-  }
+  };
+
+  const handleLogout = async () => {
+    const response = await fetch("/api/auth/logout", {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (response.ok) {
+      localStorage.removeItem("userName");
+      setAuthState(AuthState.Unauthenticated);
+      navigate("/", { replace: true });
+    }
+  };
 
   return (
-    <BrowserRouter>
-      <div className="body">
-        <header>
-          <h1>Welcome to TalkShow {userName}!</h1>
-
-          <nav className="navbar">
-            <menu className="navbar-nav">
-              {authState === AuthState.Authenticated && (
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="questions">
-                    Questions
-                  </NavLink>
-                </li>
-              )}
-              {authState === AuthState.Authenticated && (
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="add">
-                    Add Questions
-                  </NavLink>
-                </li>
-              )}
-            </menu>
-            {authState === AuthState.Authenticated && (
-              <NavLink className="nav-link" to="">
-                <Button
-                  variant="btn btn-sm btn-outline-secondary"
-                  onClick={() => goBack()}
-                >
-                  Logout
-                </Button>
-              </NavLink>
-            )}
-          </nav>
-        </header>
-
+    <div>
+      <div id="petals">
+        <Petals />
+      </div>
+      <div
+        className="app-container"
+        style={{ position: "relative", zIndex: 2 }}
+      >
+        {authState === AuthState.Authenticated ? (
+          <HeaderPost onLogout={handleLogout} isAuthenticated={true} />
+        ) : (
+          <HeaderPre />
+        )}
         <Routes>
           <Route
             path="/"
@@ -72,33 +62,33 @@ function App() {
               <Login
                 userName={userName}
                 authState={authState}
-                onAuthChange={(userName, authState) => {
-                  setAuthState(authState);
-                  setUserName(userName);
-                }}
+                onAuthChange={handleAuthChange}
               />
             }
-            exact
           />
-          <Route
-            path="/questions"
-            element={<Questions userName={userName} />}
-          />
-          <Route path="/add" element={<Add userName={userName} />} />
           <Route path="*" element={<NotFound />} />
+          {authState === AuthState.Authenticated && (
+            <>
+              <Route path="/questions" element={<Questions />} />
+              <Route path="/add" element={<Add />} />
+            </>
+          )}
         </Routes>
-
-        <footer>
-          <span className="text-reset">Emily De Graw</span>
-          <a href="https://github.com/Emilisav/startup">GitHub</a>
-        </footer>
+        <FooterWithLocation />
       </div>
-    </BrowserRouter>
+    </div>
   );
 }
 
 function NotFound() {
   return <main>404: Return to sender. Address unknown.</main>;
+}
+
+function FooterWithLocation() {
+  const location = useLocation();
+  const hideFooter =
+    location.pathname === "/questions" || location.pathname === "/add";
+  return !hideFooter ? <Footer /> : null;
 }
 
 export default App;
