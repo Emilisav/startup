@@ -1,24 +1,21 @@
-import React from "react";
+import React, { useRef } from "react";
 import "./alert.css"; // Import the custom styles for the alert
 
 function CustomAlert({ message, onClose }) {
-  const displayMessage =
-    message === "⚠ Error: Unauthorized"
-      ? "Wrong password"
-      : message === "⚠ Error: Existing user"
-      ? "Choose another username, username already exist"
-      : message === "⚠ Error: No user exist"
-      ? "Create account"
-      : message;
+  const popupRef = useRef(null);
+
+  // Handler for overlay click
+  const handleOverlayClick = (e) => {
+    // Only close if the click is on the overlay, not inside the popup
+    if (popupRef.current && !popupRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
 
   return (
-    <div id="popup1" className="overlay">
-      <div className="popup">
+    <div id="popup1" className="overlay" onClick={handleOverlayClick}>
+      <div className="popup" ref={popupRef}>
         <h2>{message}</h2>
-        <a className="close" href="#" onClick={onClose}>
-          &times;
-        </a>
-        <div className="content">{displayMessage}</div>
       </div>
     </div>
   );

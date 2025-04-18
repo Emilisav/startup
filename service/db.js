@@ -71,8 +71,7 @@ function addQuestion(score) {
 
 function getQuestions() {
   try {
-    const cursor = questionCollection.find();
-
+    const cursor = questionCollection.find().sort({ stars: -1 }).limit(5);
     return cursor.toArray();
   } catch (error) {
     console.log(error);

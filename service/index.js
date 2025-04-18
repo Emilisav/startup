@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const app = express();
 const db = require("./db.js");
+const llm = require("./LLM.js");
 const { newQuestionsProxy } = require("./newQuestionsProxy.js");
 const uuid = require("uuid");
 
@@ -73,6 +74,7 @@ secureApiRouter.use(async (req, res, next) => {
   authToken = req.cookies[authCookieName];
   const user = await db.getUserByToken(authToken);
   if (user) {
+    req.user = user;
     next();
   } else {
     res.status(401).send({ msg: "Unauthorized" });
@@ -82,65 +84,37 @@ secureApiRouter.use(async (req, res, next) => {
 // Get Questions
 secureApiRouter.get("/questions", async (_req, res) => {
   const questions = await db.getQuestions();
-  res.send(questions);
+  res.send(questions); // Return ALL questions
 });
 
 // ask chatGPT something
 secureApiRouter.post("/gpt", async (_req, res) => {
-  let answer = await askGPT(_req.body.question);
-  res.send(answer);
+  let answer = await llm.respond(_req.body.question);
+  res.send({ response: answer });
 });
 
-async function askGPT(question) {
-  let key = require("./key.json").key;
-
-  response = await fetch(
-    "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": key,
-      },
-      // body: '{\n  "messages": [{"role":"system","content":"You are an AI assistant that helps people find information."}],\n  "max_tokens": 800,\n  "temperature": 0.7,\n  "frequency_penalty": 0,\n  "presence_penalty": 0,\n  "top_p": 0.95,\n  "stop": null\n}',
-      body: JSON.stringify({
-        messages: [
-          {
-            role: "system",
-            /*Assistant: The role that provides responses to system-instructed or user-prompted input.
-Function: The role that provides function results for chat completions.
-System: The role that instructs or sets the behavior of the assistant.
-Tool: The role that represents extension tool activity within a chat completions operation.
-User: The role that provides input for chat completions1. */
-            content: question,
-          },
-        ],
-        max_tokens: 800,
-        temperature: 0.7,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-        top_p: 0.95,
-        stop: null,
-      }),
-    }
-  );
-
-  response2 = (await response.json()).choices;
-
-  return response2[0].message;
-}
-
 // Submit Questions
-secureApiRouter.post("/questions", (req, res) => {
-  questions = updateQuestion(req.body);
+secureApiRouter.post("/questions", async (req, res) => {
+  const newQuestion = req.body;
+  const updatedQuestions = await updateQuestion(newQuestion);
 
-  res.send(questions);
+  // Broadcast the raw question data to all clients immediately
+  proxy.broadcast({
+    type: "new_question",
+    question: {
+      question: newQuestion,
+      date: new Date().toISOString(), // Add timestamp if not present
+      userName: req.user?.name || "Guest", // Add user info if available
+    },
+  });
+
+  res.send(updatedQuestions);
 });
 
 // Update stars
 secureApiRouter.post("/star", async (req, res) => {
   questions = await db.incStar(req.body.question);
-
+  proxy.broadcast({ type: "questions_updated" });
   res.send(questions);
 });
 
@@ -160,60 +134,17 @@ app.use((_req, res) => {
 // The high scores are saved in memory and disappear whenever the service is restarted.
 let questions = [];
 async function updateQuestion(newQuestion) {
-  let found = false;
-  const questions = await db.getQuestions();
+  const existingQuestions = await db.getQuestions();
+  const exists = existingQuestions.some(
+    (q) => q.question === newQuestion.question
+  );
 
-  for (const [i, prevScore] of questions.entries()) {
-    if (newQuestion.question == prevScore) {
-      found = true;
-      break;
-    }
+  if (!exists) {
+    await db.addQuestion(newQuestion);
+    return await db.getQuestions();
   }
-
-  if (!found) {
-    db.addQuestion(newQuestion);
-  }
-
-  return questions;
+  return existingQuestions;
 }
-
-// Populate Questions
-updateQuestion({
-  question: "What number would you like to be on a sports team and why?",
-  userName: "ned",
-  stars: 0,
-  numRatings: 0,
-  date: 0,
-});
-updateQuestion({
-  question:
-    "Since events seem to always happen in threes, what is the next thing to happen to you?",
-  userName: "ned",
-  stars: 0,
-  numRatings: 0,
-  date: 0,
-});
-updateQuestion({
-  question: "What type of books do you take on vacation?",
-  userName: "ned",
-  stars: 0,
-  numRatings: 0,
-  date: 0,
-});
-updateQuestion({
-  question: "What event do you wish you had season tickets to?",
-  userName: "ned",
-  stars: 0,
-  numRatings: 0,
-  date: 0,
-});
-updateQuestion({
-  question: "What's your gift?",
-  userName: "ned",
-  stars: 0,
-  numRatings: 0,
-  date: 0,
-});
 
 function updateStar(newQuestion, questions) {
   questions.find((q) => q.question === newQuestion.question).stars =
@@ -239,4 +170,4 @@ const httpService = app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-newQuestionsProxy(httpService);
+let proxy = newQuestionsProxy(httpService);

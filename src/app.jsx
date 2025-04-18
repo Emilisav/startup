@@ -74,7 +74,7 @@ function App() {
             </>
           )}
         </Routes>
-        <FooterWithLocation />
+        <Footer />
       </div>
     </div>
   );
@@ -82,13 +82,6 @@ function App() {
 
 function NotFound() {
   return <main>404: Return to sender. Address unknown.</main>;
-}
-
-function FooterWithLocation() {
-  const location = useLocation();
-  const hideFooter =
-    location.pathname === "/questions" || location.pathname === "/add";
-  return !hideFooter ? <Footer /> : null;
 }
 
 export default App;

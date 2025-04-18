@@ -1,73 +1,128 @@
 import React, { useState } from "react";
 import LoadingOverlay from "./loading/LoadingOverlay";
+import CustomAlert from "../alert/alert.jsx";
+import "./add.css";
 
 export function Add() {
   const [question, setQuestion] = useState("");
-  const [helpQuestion, setHelpQuestion] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showCheck, setShowCheck] = useState(false);
+  const [displayError, setDisplayError] = useState("");
+  const [gptResponse, setGptResponse] = useState("");
 
-  const handleAddQuestion = (e) => {
+  // Optional: close alert handler
+  const closeAlert = () => setDisplayError("");
+
+  const handleAddQuestion = async (e) => {
     e.preventDefault();
-    alert(`Question added: ${question}`);
-    setQuestion("");
+    try {
+      const response = await fetch("api/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      });
+      if (response.ok) {
+        setShowCheck(true);
+        setQuestion("");
+        setTimeout(() => setShowCheck(false), 3000);
+      } else {
+        const body = await response.json();
+        setDisplayError(`⚠ Error: ${body.msg}`);
+      }
+    } catch (error) {
+      setDisplayError(`⚠ Failed to add question`);
+    }
   };
 
   const handleChatGPT = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Simulate API call to ChatGPT
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert(`ChatGPT called with: ${helpQuestion}`);
-      setHelpQuestion("");
+      const response = await fetch("api/gpt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      });
+      const body = await response.json();
+
+      if (response.ok) {
+        setGptResponse(body.response || JSON.stringify(body));
+      } else {
+        setDisplayError(`⚠ Error: ${body.msg}`);
+      }
+    } catch (error) {
+      setDisplayError(`⚠ Failed to load response`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div id="add">
-      <h1>Add a question</h1>
-      <form onSubmit={handleAddQuestion}>
-        <div className="mb-3">
-          <label className="form-label" htmlFor="addQuestion">
-            Question
-          </label>
-          <input
-            type="text"
-            required
-            className="form-control"
-            id="addQuestion"
-            placeholder="Your question here"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-          />
-        </div>
-        <button type="submit">Add Question</button>
-      </form>
+    <div className="add-wrapper">
+      <div className="add-box">
+        <h1 className="add-title">Add a question</h1>
+        <form className="add-form" onSubmit={handleAddQuestion}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="questionInput">
+              Question
+            </label>
+            <input
+              type="text"
+              required
+              className="form-input"
+              id="questionInput"
+              placeholder="Your question here"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+          <div className="button-row">
+            {showCheck ? (
+              <span
+                style={{
+                  color: "green",
+                  fontSize: "2rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "120px", // keeps layout from shifting
+                  minHeight: "44px",
+                }}
+                aria-label="Question added"
+              >
+                ✅
+              </span>
+            ) : (
+              <button
+                type="submit"
+                className="add-btn"
+                disabled={loading || !question}
+              >
+                Add Question
+              </button>
+            )}
+            <button
+              type="button"
+              className="add-btn"
+              onClick={handleChatGPT}
+              disabled={loading || !question}
+            >
+              Call ChatGPT
+            </button>
+          </div>
 
-      <form onSubmit={handleChatGPT}>
-        <div className="mb-3" id="gpt">
-          <label className="form-label" htmlFor="helpQuestion">
-            Get help from chatGPT
-          </label>
-          <input
-            type="text"
-            required
-            className="form-control"
-            id="helpQuestion"
-            placeholder="What do I ask someone who likes oranges to discover what else they like?"
-            value={helpQuestion}
-            onChange={(e) => setHelpQuestion(e.target.value)}
-            disabled={loading}
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          Call ChatGPT
-        </button>
-      </form>
-
-      {loading && <LoadingOverlay />}
+          {loading && <LoadingOverlay />}
+          {displayError && (
+            <CustomAlert message={displayError} onClose={closeAlert} />
+          )}
+          {gptResponse && (
+            <div className="alert alert-info mt-3">
+              <strong>ChatGPT says:</strong> {gptResponse}
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

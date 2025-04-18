@@ -1,6 +1,6 @@
 /* Main Styles */
 .login {
-  flex-grow: 1;
+  flex: 1 0 auto; /* Makes main grow to fill available space */
   display: flex;
   flex-direction: column;
   justify-content: center;

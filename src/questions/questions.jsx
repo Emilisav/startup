@@ -1,938 +1,205 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import "./questions.css";
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
-  const [joke, setJoke] = useState("");
+  const [userName, setUserName] = useState("");
+  const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
-  // Fetch joke
+  // Load userName and questions on mount
   useEffect(() => {
-    const fetchJoke = async () => {
+    let storedName = localStorage.getItem("userName");
+    if (!storedName || storedName === "undefined") {
+      storedName = `Guest${Math.floor(Math.random() * 999)}`;
+      localStorage.setItem("userName", storedName);
+    }
+    setUserName(storedName);
+
+    // Fetch questions from API or localStorage
+    async function loadQuestions() {
       try {
-        let response = await fetch("https://icanhazdadjoke.com/", {
-          headers: { Accept: "application/json" },
-        });
-        let data = await response.json();
-        setJoke(data.joke);
-      } catch (error) {
-        setJoke("Failed to load joke.");
+        const res = await fetch("/api/questions");
+        const data = await res.json();
+        // Ensure all questions have required fields
+        const sanitized = data.map((q) => ({
+          question: q.question,
+          stars: typeof q.stars === "number" ? q.stars : 0,
+          date: q.date || new Date().toISOString(),
+          userName: q.userName || "Guest",
+        }));
+        localStorage.setItem("questions", JSON.stringify(sanitized));
+        setQuestions(sanitized);
+      } catch {
+        const cached = localStorage.getItem("questions");
+        if (cached) setQuestions(JSON.parse(cached));
+        else setQuestions([]);
+      }
+    }
+    loadQuestions();
+  }, []);
+
+  // WebSocket setup
+  useEffect(() => {
+    const protocol = window.location.protocol === "http:" ? "ws" : "wss";
+    const wsUrl = `${protocol}://${window.location.host}/ws`;
+
+    function connectWebSocket() {
+      if (wsRef.current) wsRef.current.close();
+
+      const ws = new window.WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        // Connection established
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "new_question" && data.question?.question) {
+          setQuestions((prev) => {
+            const exists = prev.some(
+              (q) => q.question === data.question?.question
+            );
+            return exists
+              ? prev
+              : [
+                  ...prev,
+                  {
+                    ...data.question,
+                    stars:
+                      typeof data.question.stars === "number"
+                        ? data.question.stars
+                        : 0,
+                    date: data.question.date || new Date().toISOString(),
+                    userName: data.question.userName || "Guest",
+                  },
+                ];
+          });
+        } else {
+          // For star updates and other events, refetch questions
+          fetch("/api/questions")
+            .then((res) => res.json())
+            .then((data) => {
+              const sanitized = data.map((q) => ({
+                question: q.question,
+                stars: typeof q.stars === "number" ? q.stars : 0,
+                date: q.date || new Date().toISOString(),
+                userName: q.userName || "Guest",
+              }));
+              setQuestions(sanitized);
+              localStorage.setItem("questions", JSON.stringify(sanitized));
+            });
+        }
+      };
+
+      ws.onclose = () => {
+        // Try to reconnect after 3 seconds
+        reconnectTimeoutRef.current = setTimeout(connectWebSocket, 3000);
+      };
+
+      ws.onerror = (err) => {
+        // Optionally handle error
+        ws.close();
+      };
+    }
+
+    connectWebSocket();
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
       }
     };
-    fetchJoke();
   }, []);
 
-  // Fetch questions
-  useEffect(() => {
-    fetch("/api/questions")
-      .then((response) => response.json())
-      .then((questions) => {
-        setQuestions(questions);
-        localStorage.setItem("questions", JSON.stringify(questions));
-      })
-      .catch(() => {
-        const questionsText = localStorage.getItem("questions");
-        if (questionsText) {
-          setQuestions(JSON.parse(questionsText));
-        }
+  // Star or unstar a question
+  const handleStar = useCallback(async (q, index) => {
+    const newRating = index + 1;
+    const add = newRating > q.stars;
+
+    try {
+      const res = await fetch("/api/star", {
+        method: add ? "POST" : "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ question: q.question }),
       });
+      const updated = await res.json();
+      setQuestions(updated);
+      localStorage.setItem("questions", JSON.stringify(updated));
+    } catch (err) {
+      // Local fallback
+      setQuestions((qs) =>
+        qs.map((qq) =>
+          qq.question === q.question ? { ...qq, stars: newRating } : qq
+        )
+      );
+    }
   }, []);
+
+  // Top and latest logic
+  const topQuestions = [...questions]
+    .sort((a, b) => b.stars - a.stars)
+    .slice(0, 5);
+
+  const latestQuestions = [...questions]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 3);
+
+  // Render star-shaped checkboxes
+  function renderStars(q) {
+    return (
+      <div className="stars">
+        {[...Array(5)].map((_, i) => (
+          <input
+            key={i}
+            type="checkbox"
+            checked={i < q.stars}
+            onChange={() => handleStar(q, i)}
+            className="star-checkbox"
+            aria-label={`${i + 1} stars`}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <main className="home">
-      <div id="joke-container">
-        <h2>Random Joke of the Day</h2>
-        <div id="joke">{joke}</div>
-      </div>
-      {/* Render your questions here */}
-    </main>
-  );
-}
-
-/*return (
     <main>
       <h2>Top Questions</h2>
       <div id="top">
         <table className="table">
-          <tr>
-            <td id="q1" data-th="Question">
-              1. What number would you like to be on a sports team and why?
-            </td>
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="q11" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q12" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q13" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q14" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q15" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td id="q2" data-th="Question">
-              2. Since events seem to always happen in threes, what is the next
-              thing to happen to you?
-            </td>
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="q21" onClick="star(id)" type="checkbox" checked />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q22" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q23" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q24" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q25" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td id="q3" data-th="Question">
-              3. What type of books do you take on vacation?
-            </td>
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="q31" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q32" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q33" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q34" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q35" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td id="q4" data-th="Question">
-              4. What event do you wish you had season tickets to?
-            </td>
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="q41" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q42" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q43" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q44" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q45" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td id="q5" data-th="Question">
-              5. What's your gift?
-            </td>
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="q51" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q52" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q53" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q54" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="q55" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
+          <tbody>
+            {topQuestions.map((q, idx) => (
+              <tr key={q.question}>
+                <td data-th="Question">
+                  {idx + 1}. {q.question}
+                </td>
+                <td data-th="Stars">{renderStars(q)}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
-      <div id="new">
-        <h2>These are the latest questions!</h2>
-        <table className="table" id="player-messages">
-          <tr>
-            <td id="s1" data-th="Question">
-              What is your favorite holiday and why? -BobTheBuilder
-            </td>
 
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="s11" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s12" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s13" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s14" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s15" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td id="s2" data-th="Question">
-              Where is your favorite quiet place? - Amy334
-            </td>
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="s21" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s22" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s23" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s24" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s25" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td id="s3" data-th="Question">
-              What gift would you like to receive from your significant other? -
-              ddd777
-            </td>
-            <td data-th="Stars">
-              <span className="stars">
-                <label className="container">
-                  <input id="s31" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s32" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s33" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s34" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>{" "}
-                </label>
-                <label className="container">
-                  <input id="s35" onClick="star(id)" type="checkbox" />
-                  <svg
-                    height="24px"
-                    checked
-                    id="Layer_1"
-                    version="1.2"
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    xml:space="preserve"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <g>
-                      <g>
-                        <path d="M9.362,9.158c0,0-3.16,0.35-5.268,0.584c-0.19,0.023-0.358,0.15-0.421,0.343s0,0.394,0.14,0.521    c1.566,1.429,3.919,3.569,3.919,3.569c-0.002,0-0.646,3.113-1.074,5.19c-0.036,0.188,0.032,0.387,0.196,0.506    c0.163,0.119,0.373,0.121,0.538,0.028c1.844-1.048,4.606-2.624,4.606-2.624s2.763,1.576,4.604,2.625    c0.168,0.092,0.378,0.09,0.541-0.029c0.164-0.119,0.232-0.318,0.195-0.505c-0.428-2.078-1.071-5.191-1.071-5.191    s2.353-2.14,3.919-3.566c0.14-0.131,0.202-0.332,0.14-0.524s-0.23-0.319-0.42-0.341c-2.108-0.236-5.269-0.586-5.269-0.586    s-1.31-2.898-2.183-4.83c-0.082-0.173-0.254-0.294-0.456-0.294s-0.375,0.122-0.453,0.294C10.671,6.26,9.362,9.158,9.362,9.158z"></path>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </span>
-            </td>
-          </tr>
+      <h2>These are the latest questions!</h2>
+      <div id="new">
+        <table className="table" id="player-messages">
+          <tbody>
+            {latestQuestions.map((q) => (
+              <tr key={q.question + q.date}>
+                <td data-th="Question">
+                  {q.question} - {q.userName}
+                </td>
+                <td data-th="Stars">{renderStars(q)}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </main>
-  );*/
+  );
+}
