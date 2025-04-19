@@ -56,7 +56,7 @@ export function Add({ isOpen, onClose }) {
             : JSON.stringify(body.response || body);
         setGptResponse(output);
       } else {
-        setDisplayError(`⚠ Error: ${body.msg}`);
+        setDisplayError(`⚠${body.msg}`);
       }
     } catch (error) {
       setDisplayError(`⚠ Failed to load response`);

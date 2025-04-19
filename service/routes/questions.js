@@ -18,12 +18,12 @@ module.exports = (db, proxy) => {
     if (!questionText) {
       return res.status(400).send({ msg: "Question cannot be empty" });
     }
-    /** 
+
     let check = await checkQuestion(questionText);
 
     if (!check.isValid) {
-      return res.status(400).send({ msg: check.msg });
-    }**/
+      return res.status(400).send({ msg: check.msg.slice(3) });
+    }
 
     const questionObj = {
       question: questionText,
@@ -60,7 +60,7 @@ module.exports = (db, proxy) => {
       let key = require("./key.json").key;
 
       response = await fetch(
-        "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
+        "https://nddeg-m9oiap5m-eastus2.cognitiveservices.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview",
         {
           method: "POST",
           headers: {
@@ -72,11 +72,11 @@ module.exports = (db, proxy) => {
             messages: [
               {
                 role: "system",
-                /*Assistant: The role that provides responses to system-instructed or user-prompted input.
-Function: The role that provides function results for chat completions.
-System: The role that instructs or sets the behavior of the assistant.
-Tool: The role that represents extension tool activity within a chat completions operation.
-User: The role that provides input for chat completions1. */
+                content:
+                  "Your purpose is to verify whether the user's input is appropriate for inclusion in a database of social interaction questions. Check that the input is phrased as a question suitable for use in a social context (e.g., conversation starters, icebreakers, or general discussion). Ensure the question is safe for work and free from inappropriate, offensive, or sensitive content. Begin your response with Yes if the input is valid, or No if it is not, followed by a brief explanation. Example Output: Yes: This is a suitable and safe question for social interaction. No: This is not phrased as a question, or it contains inappropriate content.",
+              },
+              {
+                role: "user",
                 content: question,
               },
             ],
@@ -90,13 +90,15 @@ User: The role that provides input for chat completions1. */
         }
       );
 
-      response2 = (await response.json()).choices;
+      response2 = await response.json();
 
-      const keyResponse = response2[0].message.content;
+      const keyResponse = response2.choices[0].message.content;
 
-      // parse response for yes or no
-      // if valid, return true
-      // else return false and message
+      if (keyResponse.startsWith("Yes")) {
+        return { isValid: true, msg: keyResponse };
+      } else {
+        return { isValid: false, msg: keyResponse };
+      }
     } catch (error) {
       console.log(error);
     }

@@ -61,12 +61,12 @@
   color: #37b978;
 } /* pastel green, more contrast */
 .load-letter:nth-child(7n + 6) {
-  color: #e6b800;
+  color: #eacd5d;
   font-weight: 900;
   text-shadow: 0 1px 2px #fff0f6; /* extra pop for yellow */
 } /* pastel yellow, bold and darker */
 .load-letter:nth-child(7n + 7) {
-  color: #22223b;
+  color: #6f6fa2;
 } /* deep gray for contrast */
 
 @keyframes move {
