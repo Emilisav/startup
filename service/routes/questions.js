@@ -18,12 +18,12 @@ module.exports = (db, proxy) => {
     if (!questionText) {
       return res.status(400).send({ msg: "Question cannot be empty" });
     }
-
+    /** 
     let check = await checkQuestion(questionText);
 
     if (!check.isValid) {
       return res.status(400).send({ msg: check.msg });
-    }
+    }**/
 
     const questionObj = {
       question: questionText,
