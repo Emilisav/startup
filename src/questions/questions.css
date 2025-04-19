@@ -38,6 +38,8 @@
   font-weight: 700;
   font-size: 1.08em;
   border-bottom: 2px solid #d6c3fa;
+  vertical-align: middle;
+  height: 64px;
 }
 
 .questions-table tr {
@@ -67,7 +69,9 @@
 }
 
 .q-stars {
-  min-width: 100px;
+  min-width: 130px;
+  text-align: left;
+  vertical-align: middle;
 }
 
 /* Star checkboxes (compact, pastel) */
@@ -118,5 +122,12 @@
   .questions-table th,
   .questions-table td {
     padding: 10px 6px;
+  }
+}
+
+/* Hide Latest Questions table if not enough space */
+@media (max-width: 1100px) {
+  .tables-flex-wrapper > div:nth-child(2) {
+    display: none;
   }
 }
