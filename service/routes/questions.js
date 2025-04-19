@@ -9,37 +9,41 @@ module.exports = (db, proxy) => {
   });
 
   router.post("/", async (req, res) => {
-    const rawQuestion = req.body.question || req.body;
-    const questionText =
-      typeof rawQuestion === "string"
-        ? rawQuestion.trim()
-        : (rawQuestion.question || "").trim();
+    try {
+      const rawQuestion = req.body.question || req.body;
+      const questionText =
+        typeof rawQuestion === "string"
+          ? rawQuestion.trim()
+          : (rawQuestion.question || "").trim();
 
-    if (!questionText) {
-      return res.status(400).send({ msg: "Question cannot be empty" });
+      if (!questionText) {
+        return res.status(400).send({ msg: "Question cannot be empty" });
+      }
+
+      const check = await checkQuestion(questionText);
+
+      if (!check.isValid) {
+        return res.status(400).send({ msg: check.msg.replace(/^No:\s*/, "") });
+      }
+
+      const questionObj = {
+        question: questionText,
+        stars: 0,
+        date: new Date().toISOString(),
+        userName: req.user?.name || req.body.user || "Guest",
+      };
+
+      const updatedQuestions = await updateQuestion(db, questionObj);
+
+      proxy.broadcast?.({
+        type: "new_question",
+        question: questionObj,
+      });
+
+      res.send(updatedQuestions);
+    } catch (err) {
+      res.status(500).send({ msg: "Internal server error" });
     }
-
-    let check = await checkQuestion(questionText);
-
-    if (!check.isValid) {
-      return res.status(400).send({ msg: check.msg.slice(3) });
-    }
-
-    const questionObj = {
-      question: questionText,
-      stars: 0,
-      date: new Date().toISOString(),
-      userName: req.user?.name || "Guest",
-    };
-
-    const updatedQuestions = await updateQuestion(db, questionObj);
-
-    proxy.broadcast({
-      type: "new_question",
-      question: questionObj,
-    });
-
-    res.send(updatedQuestions);
   });
 
   async function updateQuestion(db, newQuestion) {

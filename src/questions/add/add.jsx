@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import LoadingOverlay from "./loading/LoadingOverlay";
+import LoadingOverlay from "./loading/LoadingOverlay.jsx";
 import CustomAlert from "../../alert/alert.jsx";
 import "./add.css";
 
@@ -10,7 +10,6 @@ export function Add({ isOpen, onClose }) {
   const [displayError, setDisplayError] = useState("");
   const [gptResponse, setGptResponse] = useState("");
 
-  // Optional: close alert handler
   const closeAlert = () => setDisplayError("");
 
   const handleAddQuestion = async (e) => {
@@ -19,7 +18,10 @@ export function Add({ isOpen, onClose }) {
       const response = await fetch("api/questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({
+          question: question,
+          user: localStorage.getItem("userName"),
+        }),
       });
       if (response.ok) {
         setShowCheck(true);
@@ -49,7 +51,6 @@ export function Add({ isOpen, onClose }) {
       const body = await response.json();
 
       if (response.ok) {
-        // Stringify if response isn't a string
         const output =
           typeof body.response === "string"
             ? body.response
@@ -111,7 +112,7 @@ export function Add({ isOpen, onClose }) {
                     display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    minWidth: "120px", // keeps layout from shifting
+                    minWidth: "120px",
                     minHeight: "44px",
                   }}
                   aria-label="Question added"

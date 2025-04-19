@@ -5,7 +5,7 @@ import useQuestions from "./useQuestions";
 import QuestionsTable from "./questionsTable";
 import { getRandomUnique } from "./utils";
 import "./questions.css";
-import Add from "./add/add";
+import Add from "./add/Add";
 
 export default function Questions() {
   const { questions, handleStar } = useQuestions();
