@@ -5,7 +5,6 @@ import useQuestions from "./useQuestions";
 import QuestionsTable from "./questionsTable";
 import { getRandomUnique } from "./utils";
 import "./questions.css";
-import Modal from "./model/modal";
 import Add from "./add/add";
 
 export default function Questions() {
@@ -68,9 +67,7 @@ export default function Questions() {
       </button>
 
       {/* Modal for Add Question */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setAddModalOpen(false)}>
-        <Add onClose={() => setAddModalOpen(false)} />
-      </Modal>
+      <Add isOpen={isAddModalOpen} onClose={() => setAddModalOpen(false)} />
 
       <div className="tables-flex-wrapper">
         <div>

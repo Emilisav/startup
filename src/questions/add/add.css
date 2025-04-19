@@ -109,6 +109,19 @@
   min-height: 85vh; /* or 100vh minus header/footer if you have them */
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3); /* semi-transparent black */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
 .gpt-response {
   background: #f9f7fd;
   color: #44475a;

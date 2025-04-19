@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LoadingOverlay from "./loading/LoadingOverlay";
 import CustomAlert from "../../alert/alert.jsx";
 import "./add.css";
 
-export function Add({ onClose }) {
+export function Add({ isOpen, onClose }) {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
@@ -65,8 +65,24 @@ export function Add({ onClose }) {
     }
   };
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+    if (isOpen) document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
   return (
-    <div className="add-wrapper">
+    <div
+      className="add-wrapper modal-overlay"
+      onClick={onClose} // This closes modal when clicking anywhere on overlay
+      tabIndex={-1}
+      aria-modal="true"
+      role="dialog"
+    >
       <div className="add-box">
         <h1 className="add-title">Add a question</h1>
         <form className="add-form" onSubmit={handleAddQuestion}>
