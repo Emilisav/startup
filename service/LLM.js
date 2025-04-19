@@ -4,7 +4,7 @@ const path = require("path");
 class PythonProcessManager {
   constructor() {
     this.workerPool = [];
-    this.maxWorkers = 4; // Adjust based on CPU cores
+    this.maxWorkers = 1; // Adjust based on CPU cores
     this.requestQueue = [];
     this.initWorkerPool();
   }

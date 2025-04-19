@@ -103,17 +103,29 @@ secureApiRouter.post("/gpt", async (req, res) => {
 
 // Submit Questions
 secureApiRouter.post("/questions", async (req, res) => {
-  const newQuestion = req.body;
-  const updatedQuestions = await updateQuestion(newQuestion);
+  // Validate input first
+  const rawQuestion = req.body.question || req.body;
+  const questionText =
+    typeof rawQuestion === "string"
+      ? rawQuestion.trim()
+      : (rawQuestion.question || "").trim();
 
-  // Broadcast the raw question data to all clients immediately
+  if (!questionText) {
+    return res.status(400).send({ msg: "Question cannot be empty" });
+  }
+
+  const questionObj = {
+    question: questionText, // Now guaranteed to be non-empty
+    stars: 0,
+    date: new Date().toISOString(),
+    userName: req.user?.name || "Guest",
+  };
+
+  const updatedQuestions = await updateQuestion(questionObj);
+
   proxy.broadcast({
     type: "new_question",
-    question: {
-      question: newQuestion,
-      date: new Date().toISOString(), // Add timestamp if not present
-      userName: req.user?.name || "Guest", // Add user info if available
-    },
+    question: questionObj, // Send validated object
   });
 
   res.send(updatedQuestions);

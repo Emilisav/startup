@@ -10,36 +10,19 @@ function newQuestionsProxy(httpServer) {
 
   // Handle HTTP upgrade
   httpServer.on("upgrade", (req, socket, head) => {
-    // Verify handshake first
     if (!verifyHandshake(req)) {
       socket.write("HTTP/1.1 400 Bad Request\r\n\r\n");
       socket.destroy();
       return;
     }
+
+    // Let the WebSocketServer handle the handshake
     wss.handleUpgrade(req, socket, head, (ws) => {
       wss.emit("connection", ws, req);
     });
-
-    // Create accept hash
-    const acceptKey = crypto
-      .createHash("sha1")
-      .update(key + WEBSOCKET_MAGIC_STRING)
-      .digest("base64");
-
-    // Write WebSocket handshake response
-    const responseHeaders =
-      [
-        "HTTP/1.1 101 Switching Protocols",
-        "Upgrade: websocket",
-        "Connection: Upgrade",
-        `Sec-WebSocket-Accept: ${acceptKey}`,
-      ].join("\r\n") + "\r\n\r\n";
-
-    socket.write(responseHeaders);
-    wss.emit("connection", req.socket, req);
   });
 
-  // WebSocket connection handling
+  // WebSocket connection handling (keep existing code below)
   wss.on("connection", (ws, req) => {
     const connectionId = uuid.v4();
     const connection = {
