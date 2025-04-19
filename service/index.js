@@ -88,9 +88,17 @@ secureApiRouter.get("/questions", async (_req, res) => {
 });
 
 // ask chatGPT something
-secureApiRouter.post("/gpt", async (_req, res) => {
-  let answer = await llm.respond(_req.body.question);
-  res.send({ response: answer });
+secureApiRouter.post("/gpt", async (req, res) => {
+  try {
+    if (!req.body?.question?.trim()) {
+      return res.status(400).json({ error: "Empty question" });
+    }
+    const answer = await llm.respond({ question: req.body.question });
+    res.json({ response: answer.answer });
+  } catch (error) {
+    console.error("API Error:", error);
+    res.status(500).json({ error: error.message || "Internal server error" });
+  }
 });
 
 // Submit Questions

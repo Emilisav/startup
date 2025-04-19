@@ -46,7 +46,12 @@ export function Add() {
       const body = await response.json();
 
       if (response.ok) {
-        setGptResponse(body.response || JSON.stringify(body));
+        // Stringify if response isn't a string
+        const output =
+          typeof body.response === "string"
+            ? body.response
+            : JSON.stringify(body.response || body);
+        setGptResponse(output);
       } else {
         setDisplayError(`⚠ Error: ${body.msg}`);
       }

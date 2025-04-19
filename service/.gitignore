@@ -5,3 +5,4 @@ dist/
 dbConfig.json
 key.json
 dbConfig.json
+.cache/
