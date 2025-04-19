@@ -9,7 +9,6 @@
   align-items: stretch;
   border: 3px solid #b6e2d3;
 }
-
 .add-title {
   font-family: "Georgia", serif;
   font-size: 2.2rem;
@@ -108,4 +107,24 @@
   justify-content: center;
   align-items: center;
   min-height: 85vh; /* or 100vh minus header/footer if you have them */
+}
+
+.gpt-response {
+  background: #f9f7fd;
+  color: #44475a;
+  border-radius: 10px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(186, 216, 244, 0.1);
+  border: 1px solid #e4f7fa;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 1em;
+  white-space: pre-wrap; /* Ensures wrapping and preserves line breaks */
+  word-break: break-word; /* Breaks long words */
+  max-width: 100%;
+}
+.gpt-response strong {
+  color: #7d8ca3;
+  font-size: 1.04em;
+  font-weight: 700;
 }

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import LoadingOverlay from "./loading/LoadingOverlay";
-import CustomAlert from "../alert/alert.jsx";
+import CustomAlert from "../../alert/alert.jsx";
 import "./add.css";
 
-export function Add() {
+export function Add({ onClose }) {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
@@ -24,7 +24,10 @@ export function Add() {
       if (response.ok) {
         setShowCheck(true);
         setQuestion("");
-        setTimeout(() => setShowCheck(false), 3000);
+        setTimeout(() => {
+          setShowCheck(false);
+          if (onClose) onClose();
+        }, 1000);
       } else {
         const body = await response.json();
         setDisplayError(`⚠ Error: ${body.msg}`);
@@ -122,8 +125,9 @@ export function Add() {
             <CustomAlert message={displayError} onClose={closeAlert} />
           )}
           {gptResponse && (
-            <div className="alert alert-info mt-3">
-              <strong>ChatGPT says:</strong> {gptResponse}
+            <div className="gpt-response">
+              <strong>ChatGPT says:</strong>
+              <div>{gptResponse}</div>
             </div>
           )}
         </form>

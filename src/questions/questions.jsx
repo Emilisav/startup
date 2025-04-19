@@ -1,13 +1,16 @@
 // Questions.jsx
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import useQuestions from "./useQuestions";
 import QuestionsTable from "./questionsTable";
 import { getRandomUnique } from "./utils";
 import "./questions.css";
+import Modal from "./model/modal";
+import Add from "./add/add";
 
 export default function Questions() {
   const { questions, handleStar } = useQuestions();
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
 
   function renderStars(q) {
     return (
@@ -54,7 +57,21 @@ export default function Questions() {
   }, [questions]);
 
   return (
-    <main className="questions__main">
+    <main className="questions__main" style={{ position: "relative" }}>
+      {/* Plus button at the top right */}
+      <button
+        className="plus-btn"
+        onClick={() => setAddModalOpen(true)}
+        aria-label="Add Question"
+      >
+        +
+      </button>
+
+      {/* Modal for Add Question */}
+      <Modal isOpen={isAddModalOpen} onClose={() => setAddModalOpen(false)}>
+        <Add onClose={() => setAddModalOpen(false)} />
+      </Modal>
+
       <div className="tables-flex-wrapper">
         <div>
           <h2>Top Questions</h2>

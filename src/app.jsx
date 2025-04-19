@@ -6,7 +6,6 @@ import HeaderPost from "./header/headerPost";
 import HeaderPre from "./header/headerPre";
 import Footer from "./footer/footer";
 import Questions from "./questions/questions";
-import Add from "./add/add";
 import Petals from "./petals/Petals.jsx";
 import "./petals/petals.css";
 
@@ -70,7 +69,6 @@ function App() {
           {authState === AuthState.Authenticated && (
             <>
               <Route path="/questions" element={<Questions />} />
-              <Route path="/add" element={<Add />} />
             </>
           )}
         </Routes>
