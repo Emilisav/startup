@@ -19,6 +19,12 @@ module.exports = (db, proxy) => {
       return res.status(400).send({ msg: "Question cannot be empty" });
     }
 
+    let check = await checkQuestion(questionText);
+
+    if (!check.isValid) {
+      return res.status(400).send({ msg: check.msg });
+    }
+
     const questionObj = {
       question: questionText,
       stars: 0,
@@ -47,6 +53,53 @@ module.exports = (db, proxy) => {
       return await db.getQuestions();
     }
     return existingQuestions;
+  }
+
+  async function checkQuestion(question) {
+    try {
+      let key = require("./key.json").key;
+
+      response = await fetch(
+        "https://degrawchatgpt.openai.azure.com/openai/deployments/degraw/chat/completions?api-version=2024-02-15-preview",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": key,
+          },
+          // body: '{\n  "messages": [{"role":"system","content":"You are an AI assistant that helps people find information."}],\n  "max_tokens": 800,\n  "temperature": 0.7,\n  "frequency_penalty": 0,\n  "presence_penalty": 0,\n  "top_p": 0.95,\n  "stop": null\n}',
+          body: JSON.stringify({
+            messages: [
+              {
+                role: "system",
+                /*Assistant: The role that provides responses to system-instructed or user-prompted input.
+Function: The role that provides function results for chat completions.
+System: The role that instructs or sets the behavior of the assistant.
+Tool: The role that represents extension tool activity within a chat completions operation.
+User: The role that provides input for chat completions1. */
+                content: question,
+              },
+            ],
+            max_tokens: 800,
+            temperature: 0.7,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            top_p: 0.95,
+            stop: null,
+          }),
+        }
+      );
+
+      response2 = (await response.json()).choices;
+
+      const keyResponse = response2[0].message.content;
+
+      // parse response for yes or no
+      // if valid, return true
+      // else return false and message
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return router;

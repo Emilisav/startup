@@ -3,6 +3,6 @@
 node_modules/
 dist/
 dbConfig.json
-key.json
+routes/key.json
 dbConfig.json
 .cache/
