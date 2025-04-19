@@ -77,76 +77,78 @@ export function Add({ isOpen, onClose }) {
 
   return (
     <div
-      className="add-wrapper modal-overlay"
-      onClick={onClose} // This closes modal when clicking anywhere on overlay
+      className="modal-overlay"
+      onClick={onClose}
       tabIndex={-1}
       aria-modal="true"
       role="dialog"
     >
-      <div className="add-box">
-        <h1 className="add-title">Add a question</h1>
-        <form className="add-form" onSubmit={handleAddQuestion}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="questionInput">
-              Question
-            </label>
-            <input
-              type="text"
-              required
-              className="form-input"
-              id="questionInput"
-              placeholder="Your question here"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              disabled={loading}
-            />
-          </div>
-          <div className="button-row">
-            {showCheck ? (
-              <span
-                style={{
-                  color: "green",
-                  fontSize: "2rem",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: "120px", // keeps layout from shifting
-                  minHeight: "44px",
-                }}
-                aria-label="Question added"
-              >
-                ✅
-              </span>
-            ) : (
+      <div className="add-wrapper">
+        <div className="add-box" onClick={(e) => e.stopPropagation()}>
+          <h1 className="add-title">Add a question</h1>
+          <form className="add-form" onSubmit={handleAddQuestion}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="questionInput">
+                Question
+              </label>
+              <input
+                type="text"
+                required
+                className="form-input"
+                id="questionInput"
+                placeholder="Your question here"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <div className="button-row">
+              {showCheck ? (
+                <span
+                  style={{
+                    color: "green",
+                    fontSize: "2rem",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: "120px", // keeps layout from shifting
+                    minHeight: "44px",
+                  }}
+                  aria-label="Question added"
+                >
+                  ✅
+                </span>
+              ) : (
+                <button
+                  type="submit"
+                  className="add-btn"
+                  disabled={loading || !question}
+                >
+                  Add Question
+                </button>
+              )}
               <button
-                type="submit"
+                type="button"
                 className="add-btn"
+                onClick={handleChatGPT}
                 disabled={loading || !question}
               >
-                Add Question
+                Call ChatGPT
               </button>
-            )}
-            <button
-              type="button"
-              className="add-btn"
-              onClick={handleChatGPT}
-              disabled={loading || !question}
-            >
-              Call ChatGPT
-            </button>
-          </div>
-
-          {loading && <LoadingOverlay />}
-          {displayError && (
-            <CustomAlert message={displayError} onClose={closeAlert} />
-          )}
-          {gptResponse && (
-            <div className="gpt-response">
-              <strong>ChatGPT says:</strong>
-              <div>{gptResponse}</div>
             </div>
-          )}
-        </form>
+
+            {loading && <LoadingOverlay />}
+            {displayError && (
+              <CustomAlert message={displayError} onClose={closeAlert} />
+            )}
+            {gptResponse && (
+              <div className="gpt-response">
+                <strong>ChatGPT says:</strong>
+                <div>{gptResponse}</div>
+              </div>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );
